@@ -1,0 +1,108 @@
+{
+  "name": "Voice Diary - 음성 일기 인사이트",
+  "short_name": "Voice Diary",
+  "description": "매일의 음성 일기를 녹음하고 AI를 통해 감정 분석과 인사이트를 제공합니다",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0a0a0a",
+  "orientation": "portrait",
+  "scope": "/",
+  "dir": "ltr",
+  "lang": "ko-KR",
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.svg",
+      "sizes": "72x72",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-96x96.svg",
+      "sizes": "96x96",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-128x128.svg",
+      "sizes": "128x128",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-144x144.svg",
+      "sizes": "144x144",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-152x152.svg",
+      "sizes": "152x152",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-192x192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-384x384.svg",
+      "sizes": "384x384",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["lifestyle", "productivity", "utilities"],
+  "screenshots": [
+    {
+      "src": "/screenshots/home.svg",
+      "sizes": "1080x1920",
+      "type": "image/svg+xml",
+      "form_factor": "narrow",
+      "label": "홈 화면"
+    },
+    {
+      "src": "/screenshots/record.svg",
+      "sizes": "1080x1920",
+      "type": "image/svg+xml",
+      "form_factor": "narrow",
+      "label": "음성 녹음"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "새 일기 작성",
+      "short_name": "녹음",
+      "description": "음성으로 새로운 일기를 작성합니다",
+      "url": "/record",
+      "icons": [
+        {
+          "src": "/icons/add.svg",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "일기 목록",
+      "short_name": "목록",
+      "description": "작성한 일기를 확인합니다",
+      "url": "/diary",
+      "icons": [
+        {
+          "src": "/icons/stats.svg",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": []
+}

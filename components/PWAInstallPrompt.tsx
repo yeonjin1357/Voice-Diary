@@ -20,7 +20,7 @@ export const PWAInstallPrompt = () => {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 rounded-lg bg-card p-4 shadow-lg md:left-auto md:max-w-sm">
+    <div className="fixed bottom-4 left-4 right-4 z-50 rounded-lg bg-white p-4 shadow-lg md:left-auto md:max-w-sm">
       <button
         onClick={() => setIsDismissed(true)}
         className="absolute right-2 top-2 rounded-full p-1 hover:bg-accent"

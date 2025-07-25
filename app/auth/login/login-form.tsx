@@ -20,7 +20,7 @@ import { toast } from 'sonner'
 export default function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectedFrom = searchParams.get('redirectedFrom') || '/diary'
+  const redirectedFrom = searchParams.get('redirectedFrom') || '/'
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -168,9 +168,8 @@ export default function LoginForm() {
         if (error) throw error
 
         toast.success('로그인되었습니다!')
-      }
-
-      if (!isSignUp) {
+        
+        // 로그인 성공 후 바로 리다이렉트
         router.push(redirectedFrom)
         router.refresh()
       }

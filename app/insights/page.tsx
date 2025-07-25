@@ -181,7 +181,7 @@ export default function InsightsPage() {
           </div>
 
           {/* 감정 분포 차트 */}
-          <div className="bg-white rounded-2xl p-5 border border-gray-100 mb-5">
+          <div className="bg-white rounded-2xl p-5 border border-gray-100 mb-5 outline-none focus:outline-none">
             <div className="mb-4">
               <h3 className="flex items-center gap-2 text-base font-medium text-gray-900">
                 <div className="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center">
@@ -192,7 +192,7 @@ export default function InsightsPage() {
               <p className="text-sm text-gray-500 mt-1">기간 동안의 감정 비율</p>
             </div>
             {emotionData.length > 0 ? (
-              <div className="h-[300px]">
+              <div className="h-[300px] select-none">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -221,7 +221,7 @@ export default function InsightsPage() {
           </div>
 
           {/* 감정 추세 차트 */}
-          <div className="bg-white rounded-2xl p-5 border border-gray-100 mb-5">
+          <div className="bg-white rounded-2xl p-5 border border-gray-100 mb-5 outline-none focus:outline-none">
             <div className="mb-4">
               <h3 className="flex items-center gap-2 text-base font-medium text-gray-900">
                 <div className="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
@@ -232,7 +232,7 @@ export default function InsightsPage() {
               <p className="text-sm text-gray-500 mt-1">날짜별 감정 변화</p>
             </div>
             {dailyEmotionData.length > 0 ? (
-              <div className="h-[300px]">
+              <div className="h-[300px] select-none">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={formatDailyEmotionDataForLineChart()}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
@@ -262,7 +262,7 @@ export default function InsightsPage() {
           </div>
 
           {/* 키워드 차트 */}
-          <div className="bg-white rounded-2xl p-5 border border-gray-100">
+          <div className="bg-white rounded-2xl p-5 border border-gray-100 outline-none focus:outline-none">
             <div className="mb-4">
               <h3 className="flex items-center gap-2 text-base font-medium text-gray-900">
                 <div className="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center">
@@ -273,7 +273,7 @@ export default function InsightsPage() {
               <p className="text-sm text-gray-500 mt-1">일기에서 자주 나타난 단어들</p>
             </div>
             {keywordData.length > 0 ? (
-              <div className="h-[300px]">
+              <div className="h-[300px] select-none">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={keywordData.slice(0, 10)}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />

@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Mic, Shield } from 'lucide-react'
 
 export function MicrophonePermission() {
-  const [permission, setPermission] = useState<PermissionState>('prompt')
   const [showBanner, setShowBanner] = useState(false)
 
   useEffect(() => {
@@ -14,11 +13,9 @@ export function MicrophonePermission() {
     if (navigator.permissions && navigator.permissions.query) {
       navigator.permissions.query({ name: 'microphone' as PermissionName })
         .then((result) => {
-          setPermission(result.state)
           setShowBanner(result.state === 'prompt')
           
           result.addEventListener('change', () => {
-            setPermission(result.state)
             setShowBanner(result.state === 'prompt')
           })
         })

@@ -12,7 +12,6 @@ export async function GET(request: NextRequest) {
 
     // URL 파라미터 가져오기
     const searchParams = request.nextUrl.searchParams
-    const period = searchParams.get('period') || 'month'
     const startDate = searchParams.get('startDate')
     const endDate = searchParams.get('endDate')
 
@@ -36,7 +35,7 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    const diaryIds = diaryEntries.map((entry: any) => entry.id)
+    const diaryIds = diaryEntries.map((entry: { id: string }) => entry.id)
 
     // 키워드 데이터 가져오기
     const { data: keywords, error: keywordsError } = await supabase

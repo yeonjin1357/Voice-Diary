@@ -12,7 +12,6 @@ export async function GET(request: NextRequest) {
 
     // URL 파라미터 가져오기
     const searchParams = request.nextUrl.searchParams
-    const period = searchParams.get('period') || 'month'
     const startDate = searchParams.get('startDate')
     const endDate = searchParams.get('endDate')
 
@@ -39,7 +38,7 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    const diaryIds = diaryEntries.map((entry: any) => entry.id)
+    const diaryIds = diaryEntries.map((entry: { id: string }) => entry.id)
 
     // 감정 데이터 가져오기
     const { data: emotions, error: emotionsError } = await supabase
@@ -53,7 +52,7 @@ export async function GET(request: NextRequest) {
     const emotionSummary: { [key: string]: number } = {}
     const dailyEmotions: { [date: string]: { [emotion: string]: number } } = {}
 
-    emotions?.forEach((emotion: any) => {
+    emotions?.forEach((emotion: { type: string; score: number; diary_entry_id: string }) => {
       // 전체 합계
       if (!emotionSummary[emotion.type]) {
         emotionSummary[emotion.type] = 0
@@ -61,7 +60,7 @@ export async function GET(request: NextRequest) {
       emotionSummary[emotion.type] += emotion.score
 
       // 일별 데이터
-      const entry = diaryEntries.find((e: any) => e.id === emotion.diary_entry_id)
+      const entry = diaryEntries.find((e: { id: string; date: string }) => e.id === emotion.diary_entry_id)
       if (entry) {
         const date = entry.date
         if (!dailyEmotions[date]) {

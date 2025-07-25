@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, LineChart, Line } from 'recharts'
-import { Calendar, TrendingUp, Hash, Heart } from 'lucide-react'
+import { TrendingUp, Hash, Heart } from 'lucide-react'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import { toast } from 'sonner'
@@ -51,6 +51,7 @@ export default function InsightsPage() {
 
   useEffect(() => {
     fetchInsightsData()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPeriod])
 
   const fetchInsightsData = async () => {
@@ -61,7 +62,7 @@ export default function InsightsPage() {
 
       // 날짜 범위 계산
       const endDate = new Date()
-      let startDate = new Date()
+      const startDate = new Date()
       
       switch (selectedPeriod) {
         case 'week':

@@ -1,13 +1,14 @@
 {
-  "name": "voice-diary",
+  "name": "ullim",
   "version": "0.1.0",
   "private": true,
-  "description": "Record your thoughts with voice and keep a personal diary",
+  "description": "울림 - 마음을 담는 음성 일기 앱",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "test": "jest --watch",
     "test:ci": "jest"
@@ -17,16 +18,23 @@
   "license": "ISC",
   "packageManager": "pnpm@10.13.1",
   "dependencies": {
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-select": "^2.2.5",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.52.1",
     "@tanstack/react-query": "^5.83.0",
     "@tanstack/react-query-devtools": "^5.83.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "lucide-react": "^0.525.0",
     "next": "^15.4.3",
+    "openai": "^5.10.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "recharts": "^3.1.0",
+    "sonner": "^2.0.6",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {

@@ -76,6 +76,7 @@
 ## 📱 PWA Configuration
 
 ### Why PWA for Voice Diary?
+
 - **Offline Access:** 오프라인에서도 일기 작성 및 조회 가능
 - **Push Notifications:** 일기 작성 리마인더, 주간 인사이트 알림
 - **App-like Experience:** 홈 화면 추가, 전체화면 모드
@@ -83,6 +84,7 @@
 - **Media Recording:** PWA의 MediaRecorder API로 음성 녹음
 
 ### Setup Instructions
+
 ```bash
 # Install PWA dependencies
 pnpm add -D next-pwa
@@ -90,6 +92,7 @@ pnpm add workbox-window
 ```
 
 ### Key Features to Implement
+
 - **Service Worker:** 오프라인 캐싱 전략 (일기 데이터, 감정 분석 결과)
 - **Web App Manifest:** 앱 아이콘, 다크 테마, standalone 모드
 - **Push Notifications:** 일기 작성 리마인더, 주간/월간 리포트
@@ -98,6 +101,7 @@ pnpm add workbox-window
 - **Background Sync:** 오프라인 작성 일기 자동 업로드
 
 ### Configuration Files
+
 - `public/manifest.json` - Web app manifest
 - `next.config.js` - PWA plugin configuration
 - `public/sw.js` - Service worker (auto-generated)
@@ -205,18 +209,21 @@ Claude, implement push notifications for daily diary reminders
 ## 🎯 Voice Diary Specific Guidelines
 
 ### 음성 녹음 구현
+
 - MediaRecorder API 사용 (브라우저 호환성 체크)
 - 최대 5분 녹음 제한
 - 녹음 중 실시간 오디오 레벨 표시
 - 녹음 파일 포맷: webm/opus (크기 최적화)
 
 ### AI API 사용
+
 - Whisper API: 음성→텍스트 변환
 - GPT-4 API: 감정 분석, 키워드 추출, 요약
 - API 응답 캐싱으로 비용 절감
 - 에러 핸들링 및 재시도 로직
 
 ### 데이터 구조
+
 ```typescript
 interface DiaryEntry {
   id: string
@@ -238,7 +245,170 @@ interface Emotion {
 ```
 
 ### 성능 최적화
+
 - 음성 파일 압축 및 최적화
 - 이미지/아이콘 lazy loading
 - React Query로 데이터 캐싱
 - 무한 스크롤로 일기 목록 로드
+
+---
+
+## 🎨 Design System & Guidelines
+
+### 📱 Mobile-First Design
+
+이 앱은 **모바일이 주 타겟**입니다. 모든 디자인 결정은 모바일 우선으로 합니다.
+
+- 최소 터치 영역: 44x44px
+- 엄지손가락으로 쉽게 닿는 하단 영역에 주요 액션 배치
+- 세로 모드 최적화 (가로 모드는 기본 대응만)
+- 모바일 제스처 고려 (스와이프, 길게 누르기 등)
+
+### 🎨 Design Principles
+
+1. **일관성**: 모든 페이지에서 동일한 디자인 언어 사용
+2. **심플함**: 과도한 장식이나 화려한 효과 배제
+3. **집중**: 핵심 기능(음성 녹음, 감정 확인)에 포커스
+4. **접근성**: 큰 글씨, 명확한 대비, 간단한 인터랙션
+
+### 🌈 Color Palette
+
+```css
+:root {
+  /* Primary - 차분한 보라색 계열 */
+  --primary: #6366f1; /* indigo-500 */
+  --primary-dark: #4f46e5; /* indigo-600 */
+  --primary-light: #818cf8; /* indigo-400 */
+
+  /* Neutral - 회색 계열 */
+  --background: #fafafa; /* neutral-50 */
+  --surface: #ffffff; /* white */
+  --text-primary: #18181b; /* neutral-900 */
+  --text-secondary: #71717a; /* neutral-500 */
+  --border: #e4e4e7; /* neutral-200 */
+
+  /* Emotions - 부드러운 파스텔톤 */
+  --emotion-joy: #fbbf24; /* amber-400 */
+  --emotion-sadness: #60a5fa; /* blue-400 */
+  --emotion-anxiety: #f87171; /* red-400 */
+  --emotion-anger: #fb923c; /* orange-400 */
+  --emotion-peace: #86efac; /* green-300 */
+  --emotion-hope: #c084fc; /* purple-400 */
+  --emotion-surprise: #fde047; /* yellow-300 */
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --surface: #18181b;
+    --text-primary: #fafafa;
+    --text-secondary: #a1a1aa;
+    --border: #27272a;
+  }
+}
+```
+
+### 📐 Typography
+
+```css
+/* Mobile Typography Scale */
+--text-xs: 0.75rem; /* 12px - 보조 텍스트 */
+--text-sm: 0.875rem; /* 14px - 본문 */
+--text-base: 1rem; /* 16px - 기본 본문 */
+--text-lg: 1.125rem; /* 18px - 부제목 */
+--text-xl: 1.25rem; /* 20px - 제목 */
+--text-2xl: 1.5rem; /* 24px - 페이지 제목 */
+
+/* Font Weight */
+--font-normal: 400;
+--font-medium: 500;
+--font-semibold: 600;
+--font-bold: 700;
+```
+
+### 📏 Spacing System
+
+```css
+/* 8px 기반 간격 시스템 */
+--space-1: 0.25rem; /* 4px */
+--space-2: 0.5rem; /* 8px */
+--space-3: 0.75rem; /* 12px */
+--space-4: 1rem; /* 16px */
+--space-5: 1.25rem; /* 20px */
+--space-6: 1.5rem; /* 24px */
+--space-8: 2rem; /* 32px */
+--space-10: 2.5rem; /* 40px */
+--space-12: 3rem; /* 48px */
+--space-16: 4rem; /* 64px */
+```
+
+### 🧩 Component Guidelines
+
+#### Bottom Navigation
+
+```tsx
+// 모바일 하단 네비게이션 (항상 표시)
+<nav className="bg-surface border-border fixed bottom-0 left-0 right-0 border-t">
+  <div className="flex justify-around py-2">
+    <NavItem icon={Home} label="홈" href="/" />
+    <NavItem icon={Mic} label="녹음" href="/record" />
+    <NavItem icon={BookOpen} label="일기" href="/diary" />
+    <NavItem icon={BarChart} label="인사이트" href="/insights" />
+  </div>
+</nav>
+```
+
+#### Floating Action Button (FAB)
+
+```tsx
+// 음성 녹음 시작을 위한 FAB
+<button className="bg-primary fixed bottom-20 right-4 h-14 w-14 rounded-full text-white shadow-lg">
+  <Mic className="h-6 w-6" />
+</button>
+```
+
+#### Cards
+
+```tsx
+// 일관된 카드 스타일
+<div className="bg-surface border-border rounded-lg border p-4 shadow-sm">
+  {/* content */}
+</div>
+```
+
+### 📱 Mobile Layout Structure
+
+```
+┌─────────────────────────┐
+│      Status Bar         │ <- System UI
+├─────────────────────────┤
+│      App Header         │ <- 최소화, 필요시만 표시
+├─────────────────────────┤
+│                         │
+│                         │
+│      Main Content       │ <- 스크롤 가능 영역
+│                         │
+│                         │
+├─────────────────────────┤
+│   Bottom Navigation     │ <- 항상 고정
+└─────────────────────────┘
+```
+
+### 🎯 UI/UX Best Practices
+
+1. **대화형 요소 크기**: 최소 44x44px
+2. **여백**: 충분한 여백으로 답답하지 않게
+3. **애니메이션**: 부드럽지만 빠르게 (200-300ms)
+4. **피드백**: 모든 인터랙션에 즉각적인 피드백
+5. **로딩 상태**: 스켈레톤 UI 또는 스피너
+6. **에러 처리**: 친근하고 도움이 되는 에러 메시지
+
+### 🚫 Design Don'ts
+
+- ❌ 그라디언트 남용
+- ❌ 과도한 그림자 효과
+- ❌ 너무 많은 색상 사용 (주요 색상 2-3개로 제한)
+- ❌ 작은 글씨 (최소 13px)
+- ❌ 복잡한 레이아웃
+- ❌ 불필요한 애니메이션

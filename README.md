@@ -1,4 +1,4 @@
-# Voice Diary - 음성 일기 인사이트
+# 울림(ULLIM) - 마음을 담는 음성 일기
 
 매일의 음성 일기를 녹음하고, AI를 통해 감정 분석과 인사이트를 제공하는 PWA 애플리케이션
 
@@ -41,6 +41,45 @@ cp .env.example .env.local
 pnpm dev
 ```
 
+### 소셜 로그인 설정
+
+본 프로젝트는 Google과 Kakao 소셜 로그인을 지원합니다.
+
+#### 1. Google OAuth 설정
+
+1. [Google Cloud Console](https://console.cloud.google.com/)에서 새 프로젝트 생성
+2. APIs & Services > Credentials에서 OAuth 2.0 Client ID 생성
+3. Authorized redirect URIs에 다음 추가:
+   - `https://YOUR_SUPABASE_PROJECT_ID.supabase.co/auth/v1/callback`
+   - 로컬 개발시: `http://localhost:3000/auth/callback`
+4. Client ID와 Client Secret 복사
+
+#### 2. Kakao OAuth 설정
+
+1. [Kakao Developers](https://developers.kakao.com/)에서 애플리케이션 생성
+2. 앱 설정 > 플랫폼에서 Web 플랫폼 등록
+3. 사이트 도메인에 다음 추가:
+   - `https://YOUR_SUPABASE_PROJECT_ID.supabase.co`
+   - 로컬 개발시: `http://localhost:3000`
+4. 카카오 로그인 > Redirect URI에 다음 추가:
+   - `https://YOUR_SUPABASE_PROJECT_ID.supabase.co/auth/v1/callback`
+5. REST API 키 복사
+
+#### 3. Supabase 대시보드 설정
+
+1. [Supabase Dashboard](https://app.supabase.com/)에서 프로젝트 선택
+2. Authentication > Providers 메뉴로 이동
+3. Google Provider 활성화:
+   - Google Client ID와 Client Secret 입력
+   - Authorized Client IDs에 Google Client ID 추가
+4. Kakao Provider 활성화:
+   - 커스텀 provider로 추가 (이름: `kakao`)
+   - Client ID: Kakao REST API 키
+   - Authorization URL: `https://kauth.kakao.com/oauth/authorize`
+   - Token URL: `https://kauth.kakao.com/oauth/token`
+   - User Info URL: `https://kapi.kakao.com/v2/user/me`
+   - Scope: `profile_nickname profile_image account_email`
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## 사용 가능한 스크립트
@@ -80,6 +119,64 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## Development
 
 This project uses Claude Code for development assistance. See CLAUDE.md for specific development guidelines.
+
+## OAuth 설정 가이드
+
+### Google OAuth 설정
+
+1. [Google Cloud Console](https://console.cloud.google.com/) 접속
+2. 새 프로젝트 생성 또는 기존 프로젝트 선택
+3. **APIs & Services** → **Credentials** 메뉴로 이동
+4. **Create Credentials** → **OAuth client ID** 클릭
+5. 애플리케이션 유형: **Web application** 선택
+6. 설정:
+   - **Authorized JavaScript origins**: `https://ntpdwicwvjfzgjpabknc.supabase.co`
+   - **Authorized redirect URIs**: `https://ntpdwicwvjfzgjpabknc.supabase.co/auth/v1/callback`
+7. 생성된 **Client ID**와 **Client Secret** 복사
+
+### Kakao OAuth 설정
+
+1. [Kakao Developers](https://developers.kakao.com/) 접속
+2. 애플리케이션 생성 또는 선택
+3. **앱 설정** → **플랫폼** → **Web 플랫폼 등록**
+   - 사이트 도메인: `https://ntpdwicwvjfzgjpabknc.supabase.co`
+4. **제품 설정** → **카카오 로그인** 활성화
+5. **Redirect URI 등록**: `https://ntpdwicwvjfzgjpabknc.supabase.co/auth/v1/callback`
+6. **보안** → **Client Secret** 생성 및 복사
+7. **REST API 키**와 **Client Secret** 복사
+
+### Supabase 설정
+
+1. Supabase 대시보드에서 **Authentication** → **Providers** 메뉴로 이동
+2. **Google** 프로바이더 활성화:
+   - Client ID와 Client Secret 입력
+3. **Kakao** 프로바이더 활성화:
+   - Client ID (REST API 키)와 Client Secret 입력
+
+### 이메일 인증 설정
+
+1. Supabase 대시보드에서 **Authentication** → **Email Templates** 메뉴로 이동
+2. **Confirm signup** 템플릿 수정:
+   - Subject: `울림 - 이메일 인증`
+   - Body: 한글 메시지로 수정
+3. **Authentication** → **Settings** → **Email Auth**에서:
+   - **Enable email confirmations**: ON
+   - **Enable email change confirmations**: ON
+
+⚠️ **중요**: Supabase는 기본적으로 이메일 발송을 지원하지만, 대량 발송이나 커스텀 도메인을 원한다면 외부 SMTP 서버 설정이 필요합니다.
+
+#### 외부 SMTP 설정 (선택사항)
+
+Gmail SMTP를 사용하는 경우:
+1. Gmail 계정에서 2단계 인증 활성화
+2. [앱 비밀번호 생성](https://myaccount.google.com/apppasswords)
+3. Supabase **Settings** → **SMTP Settings**:
+   - Host: `smtp.gmail.com`
+   - Port: `587`
+   - Username: `your-email@gmail.com`  
+   - Password: `생성한 앱 비밀번호`
+   - Sender email: `your-email@gmail.com`
+   - Sender name: `울림`
 
 ## License
 

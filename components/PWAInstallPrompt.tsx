@@ -30,7 +30,7 @@ export const PWAInstallPrompt = () => {
       </button>
       
       <div className="pr-8">
-        <h3 className="mb-2 font-semibold">Voice Diary 앱 설치</h3>
+        <h3 className="mb-2 font-semibold">울림 앱 설치</h3>
         <p className="mb-4 text-sm text-muted-foreground">
           홈 화면에 추가하여 언제든지 음성 일기를 작성하세요
         </p>

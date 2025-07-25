@@ -67,4 +67,33 @@
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
   }
+  
+  /* Recharts 차트 클릭 시 outline 제거 */
+  .recharts-wrapper,
+  .recharts-wrapper svg,
+  .recharts-wrapper path,
+  .recharts-wrapper g,
+  .recharts-wrapper text,
+  .recharts-wrapper line,
+  .recharts-wrapper rect,
+  .recharts-wrapper circle,
+  .recharts-surface,
+  .recharts-layer,
+  .recharts-bar,
+  .recharts-line,
+  .recharts-pie,
+  .recharts-sector {
+    outline: none !important;
+    outline-width: 0 !important;
+  }
+  
+  /* 모든 SVG 요소 outline 제거 */
+  svg, svg * {
+    outline: none !important;
+  }
+  
+  /* 포커스 시에도 outline 제거 */
+  *:focus {
+    outline: none !important;
+  }
 }

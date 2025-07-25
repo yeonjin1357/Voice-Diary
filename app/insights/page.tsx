@@ -192,7 +192,7 @@ export default function InsightsPage() {
               <p className="text-sm text-gray-500 mt-1">기간 동안의 감정 비율</p>
             </div>
             {emotionData.length > 0 ? (
-              <div className="h-[300px] select-none">
+              <div className="h-[300px] select-none [&_svg]:outline-none [&_*]:outline-none">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -232,7 +232,7 @@ export default function InsightsPage() {
               <p className="text-sm text-gray-500 mt-1">날짜별 감정 변화</p>
             </div>
             {dailyEmotionData.length > 0 ? (
-              <div className="h-[300px] select-none">
+              <div className="h-[300px] select-none [&_svg]:outline-none [&_*]:outline-none">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={formatDailyEmotionDataForLineChart()}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
@@ -273,7 +273,7 @@ export default function InsightsPage() {
               <p className="text-sm text-gray-500 mt-1">일기에서 자주 나타난 단어들</p>
             </div>
             {keywordData.length > 0 ? (
-              <div className="h-[300px] select-none">
+              <div className="h-[300px] select-none [&_svg]:outline-none [&_*]:outline-none">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={keywordData.slice(0, 10)}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />

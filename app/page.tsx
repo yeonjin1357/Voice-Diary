@@ -2,6 +2,7 @@
 
 import { MobileLayout } from '@/components/layout/mobile-layout'
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'
+import { MicrophonePermission } from '@/components/ui/microphone-permission'
 import { Card } from '@/components/ui/card'
 import { Mic, Calendar, Brain, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
@@ -36,6 +37,7 @@ export default function Home() {
 
   return (
     <MobileLayout>
+      <MicrophonePermission />
       <div className="px-4 py-6 space-y-6">
         {/* 인사말 섹션 */}
         <section className="text-center py-8">

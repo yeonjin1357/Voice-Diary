@@ -38,7 +38,11 @@ export default function RecordPage() {
       setAudioBlob(null)
     } catch (error) {
       console.error('녹음 시작 실패:', error)
-      toast.error('마이크 사용 권한을 허용해주세요')
+      if (error instanceof Error) {
+        toast.error(error.message)
+      } else {
+        toast.error('마이크 사용 권한을 허용해주세요')
+      }
     }
   }
 

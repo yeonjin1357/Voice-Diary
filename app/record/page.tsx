@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { MobileLayout } from '@/components/layout/mobile-layout'
 import { useRecorder } from '@/hooks/useRecorder'
 import { Card } from '@/components/ui/card'
@@ -9,6 +9,8 @@ import { Mic, Square, Pause, Play, Send, RotateCcw } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { createClient } from '@/lib/supabase/client'
+import type { User as SupabaseUser } from '@supabase/supabase-js'
 
 export default function RecordPage() {
   const router = useRouter()
@@ -26,6 +28,22 @@ export default function RecordPage() {
   
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [_user, setUser] = useState<SupabaseUser | null>(null)
+  const supabase = createClient()
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        toast.error('로그인이 필요합니다')
+        router.push('/auth/login')
+      } else {
+        setUser(user)
+      }
+    }
+    
+    checkUser()
+  }, [supabase.auth, router])
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
@@ -114,7 +132,9 @@ export default function RecordPage() {
       })
       
       if (!diaryResponse.ok) {
-        throw new Error('일기 저장에 실패했습니다')
+        const errorData = await diaryResponse.json()
+        console.error('일기 저장 실패:', errorData)
+        throw new Error(errorData.error || '일기 저장에 실패했습니다')
       }
       
       const { diaryId } = await diaryResponse.json()

@@ -17,7 +17,7 @@ interface CalendarProps {
 
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토']
 
-export function Calendar({ selectedDate, onDateSelect, diaryDates, diaries = [], className }: CalendarProps) {
+export function Calendar({ selectedDate: _, onDateSelect, diaryDates, diaries = [], className }: CalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date())
 
   const monthStart = startOfMonth(currentMonth)

@@ -111,7 +111,6 @@ export function Calendar({ selectedDate, onDateSelect, diaryDates, diaries = [],
         
         {/* 현재 달 날짜 */}
         {monthDays.map((date) => {
-          const isSelected = selectedDate && isSameDay(date, selectedDate)
           const isTodayDate = isToday(date)
           const isDiaryDate = hasDiary(date)
           const dayOfWeek = getDay(date)

@@ -9,7 +9,6 @@ import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, List } from 
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
-import { ko } from 'date-fns/locale'
 
 type ViewMode = 'list' | 'calendar'
 

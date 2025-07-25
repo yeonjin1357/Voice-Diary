@@ -48,19 +48,6 @@ export function Calendar({ selectedDate, onDateSelect, diaryDates, diaries = [],
     )
   }
 
-  const getEmotionEmoji = (emotion: string) => {
-    const emojiMap: Record<string, string> = {
-      '기쁨': '😊',
-      '슬픔': '😢',
-      '불안': '😰',
-      '분노': '😠',
-      '평온': '😌',
-      '기대': '🤗',
-      '놀람': '😮'
-    }
-    return emojiMap[emotion] || '📝'
-  }
-
   return (
     <div className={cn('bg-white rounded-2xl shadow-sm', className)}>
       {/* 헤더 */}

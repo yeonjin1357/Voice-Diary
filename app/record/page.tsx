@@ -10,7 +10,6 @@ import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
-import type { User as SupabaseUser } from '@supabase/supabase-js'
 
 export default function RecordPage() {
   const router = useRouter()
@@ -28,7 +27,6 @@ export default function RecordPage() {
   
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
-  const [_user, setUser] = useState<SupabaseUser | null>(null)
   const supabase = createClient()
 
   useEffect(() => {
@@ -37,8 +35,6 @@ export default function RecordPage() {
       if (!user) {
         toast.error('로그인이 필요합니다')
         router.push('/auth/login')
-      } else {
-        setUser(user)
       }
     }
     

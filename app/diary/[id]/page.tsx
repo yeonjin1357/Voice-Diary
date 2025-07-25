@@ -7,7 +7,19 @@ import { DiaryEntry } from '@/types'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Calendar, Hash, Trash2, Play, Pause } from 'lucide-react'
+import { Textarea } from '@/components/ui/textarea'
+import { Input } from '@/components/ui/input'
+import {
+  ArrowLeft,
+  Calendar,
+  Hash,
+  Trash2,
+  Play,
+  Pause,
+  Edit,
+  X,
+  Plus,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface DiaryDetailPageProps {
@@ -33,9 +45,15 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null)
   const [diaryId, setDiaryId] = useState<string | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editedSummary, setEditedSummary] = useState('')
+  const [editedTranscript, setEditedTranscript] = useState('')
+  const [editedKeywords, setEditedKeywords] = useState<string[]>([])
+  const [isSaving, setIsSaving] = useState(false)
+  const [newKeyword, setNewKeyword] = useState('')
 
   useEffect(() => {
-    params.then(p => {
+    params.then((p) => {
       setDiaryId(p.id)
     })
   }, [params])
@@ -51,7 +69,7 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
     try {
       setLoading(true)
       const response = await fetch(`/api/diary/${diaryId}`)
-      
+
       if (!response.ok) {
         if (response.status === 404) {
           throw new Error('일기를 찾을 수 없습니다.')
@@ -61,6 +79,9 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
 
       const { diary } = await response.json()
       setDiary(diary)
+      setEditedSummary(diary.summary)
+      setEditedTranscript(diary.transcript)
+      setEditedKeywords(diary.keywords)
     } catch (err) {
       setError(err instanceof Error ? err.message : '오류가 발생했습니다.')
     } finally {
@@ -104,13 +125,75 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
     }
   }
 
+  const handleEdit = () => {
+    setIsEditing(true)
+  }
+
+  const handleCancelEdit = () => {
+    setIsEditing(false)
+    if (diary) {
+      setEditedSummary(diary.summary)
+      setEditedTranscript(diary.transcript)
+      setEditedKeywords(diary.keywords)
+    }
+  }
+
+  const handleSaveEdit = async () => {
+    if (!diary || !diaryId) return
+
+    setIsSaving(true)
+    try {
+      const response = await fetch(`/api/diary/${diaryId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          summary: editedSummary,
+          transcript: editedTranscript,
+          keywords: editedKeywords,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('일기 수정에 실패했습니다.')
+      }
+
+      const { diary: updatedDiary } = await response.json()
+      setDiary(updatedDiary)
+      setIsEditing(false)
+    } catch (err) {
+      alert(err instanceof Error ? err.message : '수정 중 오류가 발생했습니다.')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleKeywordAdd = (keyword: string) => {
+    if (keyword.trim() && !editedKeywords.includes(keyword.trim())) {
+      setEditedKeywords([...editedKeywords, keyword.trim()])
+    }
+  }
+
+  const handleKeywordRemove = (keyword: string) => {
+    setEditedKeywords(editedKeywords.filter((k) => k !== keyword))
+  }
+
   const formatDate = (date: Date) => {
     const d = new Date(date)
     return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`
   }
 
   const getDayOfWeek = (date: Date) => {
-    const days = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일']
+    const days = [
+      '일요일',
+      '월요일',
+      '화요일',
+      '수요일',
+      '목요일',
+      '금요일',
+      '토요일',
+    ]
     return days[new Date(date).getDay()]
   }
 
@@ -124,25 +207,37 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
       >
         <ArrowLeft className="h-4 w-4" />
       </Button>
-      
+
       <h1 className="text-lg font-semibold">일기 상세</h1>
-      
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={handleDelete}
-        disabled={isDeleting}
-        className="h-8 w-8 text-red-500 hover:text-red-600"
-      >
-        <Trash2 className="h-4 w-4" />
-      </Button>
+
+      <div className="flex gap-2">
+        {!isEditing && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleEdit}
+            className="h-8 w-8"
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
+        )}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleDelete}
+          disabled={isDeleting}
+          className="h-8 w-8 text-red-500 hover:text-red-600"
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
     </div>
   )
 
   if (loading) {
     return (
       <MobileLayout header={header}>
-        <div className="flex items-center justify-center h-64">
+        <div className="flex h-64 items-center justify-center">
           <p className="text-neutral-500">일기를 불러오는 중...</p>
         </div>
       </MobileLayout>
@@ -152,7 +247,7 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
   if (error || !diary) {
     return (
       <MobileLayout header={header}>
-        <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <div className="flex h-64 flex-col items-center justify-center space-y-4">
           <p className="text-red-500">{error || '일기를 찾을 수 없습니다.'}</p>
           <Button onClick={() => router.push('/diary')}>
             목록으로 돌아가기
@@ -164,7 +259,7 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
 
   return (
     <MobileLayout header={header}>
-      <div className="px-4 py-4 space-y-4">
+      <div className="space-y-4 px-4 py-4">
         {/* 날짜 정보 */}
         <Card>
           <CardContent className="pt-6">
@@ -179,31 +274,45 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
         {/* 감정 분석 */}
         <Card>
           <CardContent className="pt-6">
-            <h2 className="font-semibold mb-3">오늘의 감정</h2>
+            <h2 className="mb-3 font-semibold">오늘의 감정</h2>
             <div className="space-y-3">
               {diary.emotions.map((emotion) => (
-                <div key={emotion.type} className="flex items-center justify-between">
+                <div
+                  key={emotion.type}
+                  className="flex items-center justify-between"
+                >
                   <Badge
                     variant="secondary"
-                    className={cn('text-xs font-medium', emotionColors[emotion.type])}
+                    className={cn(
+                      'text-xs font-medium',
+                      emotionColors[emotion.type],
+                    )}
                   >
                     {emotion.type}
                   </Badge>
                   <div className="flex items-center gap-2">
-                    <div className="w-32 bg-neutral-200 rounded-full h-2">
+                    <div className="h-2 w-32 rounded-full bg-neutral-200">
                       <div
-                        className={cn('h-2 rounded-full', emotion.type === '기쁨' ? 'bg-amber-400' :
-                          emotion.type === '슬픔' ? 'bg-blue-400' :
-                          emotion.type === '불안' ? 'bg-red-400' :
-                          emotion.type === '분노' ? 'bg-orange-400' :
-                          emotion.type === '평온' ? 'bg-green-400' :
-                          emotion.type === '기대' ? 'bg-purple-400' :
-                          'bg-yellow-400'
+                        className={cn(
+                          'h-2 rounded-full',
+                          emotion.type === '기쁨'
+                            ? 'bg-amber-400'
+                            : emotion.type === '슬픔'
+                              ? 'bg-blue-400'
+                              : emotion.type === '불안'
+                                ? 'bg-red-400'
+                                : emotion.type === '분노'
+                                  ? 'bg-orange-400'
+                                  : emotion.type === '평온'
+                                    ? 'bg-green-400'
+                                    : emotion.type === '기대'
+                                      ? 'bg-purple-400'
+                                      : 'bg-yellow-400',
                         )}
                         style={{ width: `${emotion.score}%` }}
                       />
                     </div>
-                    <span className="text-sm text-neutral-600 w-10 text-right">
+                    <span className="w-10 text-right text-sm text-neutral-600">
                       {emotion.score}%
                     </span>
                   </div>
@@ -216,10 +325,19 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
         {/* 요약 */}
         <Card>
           <CardContent className="pt-6">
-            <h2 className="font-semibold mb-3">요약</h2>
-            <p className="text-sm text-neutral-700 dark:text-neutral-300">
-              {diary.summary}
-            </p>
+            <h2 className="mb-3 font-semibold">요약</h2>
+            {isEditing ? (
+              <Textarea
+                value={editedSummary}
+                onChange={(e) => setEditedSummary(e.target.value)}
+                className="min-h-[80px] text-sm"
+                placeholder="요약을 입력하세요"
+              />
+            ) : (
+              <p className="text-sm text-neutral-700 dark:text-neutral-300">
+                {diary.summary}
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -255,33 +373,110 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
         {/* 일기 내용 */}
         <Card>
           <CardContent className="pt-6">
-            <h2 className="font-semibold mb-3">일기 내용</h2>
-            <p className="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap">
-              {diary.transcript}
-            </p>
+            <h2 className="mb-3 font-semibold">일기 내용</h2>
+            {isEditing ? (
+              <Textarea
+                value={editedTranscript}
+                onChange={(e) => setEditedTranscript(e.target.value)}
+                className="min-h-[200px] text-sm"
+                placeholder="일기 내용을 입력하세요"
+              />
+            ) : (
+              <p className="text-sm whitespace-pre-wrap text-neutral-700 dark:text-neutral-300">
+                {diary.transcript}
+              </p>
+            )}
           </CardContent>
         </Card>
 
         {/* 키워드 */}
-        {diary.keywords.length > 0 && (
+        {(diary.keywords.length > 0 || isEditing) && (
           <Card>
             <CardContent className="pt-6">
-              <h2 className="font-semibold mb-3">키워드</h2>
-              <div className="flex items-center gap-2 flex-wrap">
-                {diary.keywords.map((keyword) => (
-                  <div
-                    key={keyword}
-                    className="flex items-center gap-1 px-3 py-1 bg-neutral-100 dark:bg-neutral-800 rounded-full"
-                  >
-                    <Hash className="h-3 w-3 text-neutral-400" />
-                    <span className="text-sm">{keyword}</span>
+              <h2 className="mb-3 font-semibold">키워드</h2>
+              {isEditing ? (
+                <div className="space-y-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {editedKeywords.map((keyword) => (
+                      <div
+                        key={keyword}
+                        className="flex items-center gap-1 rounded-full bg-neutral-100 px-3 py-1 dark:bg-neutral-800"
+                      >
+                        <Hash className="h-3 w-3 text-neutral-400" />
+                        <span className="text-sm">{keyword}</span>
+                        <button
+                          onClick={() => handleKeywordRemove(keyword)}
+                          className="ml-1 hover:text-red-500"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                  <div className="flex gap-2">
+                    <Input
+                      value={newKeyword}
+                      onChange={(e) => setNewKeyword(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          handleKeywordAdd(newKeyword)
+                          setNewKeyword('')
+                        }
+                      }}
+                      placeholder="새 키워드 추가"
+                      className="flex-1"
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        handleKeywordAdd(newKeyword)
+                        setNewKeyword('')
+                      }}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-wrap items-center gap-2">
+                  {diary.keywords.map((keyword) => (
+                    <div
+                      key={keyword}
+                      className="flex items-center gap-1 rounded-full bg-neutral-100 px-3 py-1 dark:bg-neutral-800"
+                    >
+                      <Hash className="h-3 w-3 text-neutral-400" />
+                      <span className="text-sm">{keyword}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
       </div>
+
+      {/* 편집 모드 버튼 */}
+      {isEditing && (
+        <div className="sticky right-0 bottom-0 left-0 flex gap-3 border-t bg-white p-4 dark:bg-neutral-900">
+          <Button
+            variant="outline"
+            onClick={handleCancelEdit}
+            className="flex-1"
+            disabled={isSaving}
+          >
+            취소
+          </Button>
+          <Button
+            onClick={handleSaveEdit}
+            className="flex-1"
+            disabled={isSaving}
+          >
+            {isSaving ? '저장 중...' : '저장'}
+          </Button>
+        </div>
+      )}
     </MobileLayout>
   )
 }

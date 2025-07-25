@@ -1,8 +1,6 @@
 'use client'
 
 import { DiaryEntry } from '@/types'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Calendar, Hash } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -12,13 +10,13 @@ interface DiaryCardProps {
 }
 
 const emotionColors = {
-  기쁨: 'bg-amber-100 text-amber-800',
-  슬픔: 'bg-blue-100 text-blue-800',
-  불안: 'bg-red-100 text-red-800',
-  분노: 'bg-orange-100 text-orange-800',
-  평온: 'bg-green-100 text-green-800',
-  기대: 'bg-purple-100 text-purple-800',
-  놀람: 'bg-yellow-100 text-yellow-800',
+  기쁨: 'bg-amber-50 text-amber-700 border-amber-200',
+  슬픔: 'bg-blue-50 text-blue-700 border-blue-200',
+  불안: 'bg-red-50 text-red-700 border-red-200',
+  분노: 'bg-orange-50 text-orange-700 border-orange-200',
+  평온: 'bg-green-50 text-green-700 border-green-200',
+  기대: 'bg-purple-50 text-purple-700 border-purple-200',
+  놀람: 'bg-yellow-50 text-yellow-700 border-yellow-200',
 }
 
 export function DiaryCard({ diary, onClick }: DiaryCardProps) {
@@ -38,61 +36,58 @@ export function DiaryCard({ diary, onClick }: DiaryCardProps) {
     .slice(0, 2)
 
   return (
-    <Card
-      className="cursor-pointer transition-all hover:shadow-lg hover:border-purple-300 dark:hover:border-purple-700 transform hover:scale-[1.01]"
+    <div
+      className="bg-white rounded-2xl p-4 cursor-pointer transition-all hover:shadow-md active:scale-[0.98] border border-gray-100"
       onClick={onClick}
     >
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm text-neutral-500">
-            <Calendar className="h-4 w-4" />
-            <span>{formatDate(diary.date)}</span>
-            <span>({getDayOfWeek(diary.date)})</span>
-          </div>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2 text-sm text-gray-500">
+          <Calendar className="h-4 w-4" />
+          <span className="font-medium">{formatDate(diary.date)}</span>
+          <span className="text-gray-400">({getDayOfWeek(diary.date)})</span>
         </div>
-      </CardHeader>
-      <CardContent className="space-y-3">
+      </div>
+      <div className="space-y-3">
         {/* 감정 표시 */}
         <div className="flex gap-2">
           {topEmotions.map((emotion) => (
-            <Badge
+            <span
               key={emotion.type}
-              variant="secondary"
               className={cn(
-                'text-xs font-medium',
+                'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border',
                 emotionColors[emotion.type]
               )}
             >
               {emotion.type} {emotion.score}%
-            </Badge>
+            </span>
           ))}
         </div>
 
         {/* 요약 */}
-        <p className="text-sm text-neutral-700 dark:text-neutral-300 line-clamp-2">
+        <p className="text-sm text-gray-700 line-clamp-2 leading-relaxed">
           {diary.summary}
         </p>
 
         {/* 키워드 */}
         {diary.keywords.length > 0 && (
           <div className="flex items-center gap-2 flex-wrap">
-            <Hash className="h-3 w-3 text-neutral-400" />
+            <Hash className="h-3 w-3 text-gray-400" />
             {diary.keywords.slice(0, 3).map((keyword) => (
               <span
                 key={keyword}
-                className="text-xs text-neutral-500"
+                className="text-xs text-gray-500"
               >
                 {keyword}
               </span>
             ))}
             {diary.keywords.length > 3 && (
-              <span className="text-xs text-neutral-400">
+              <span className="text-xs text-gray-400">
                 +{diary.keywords.length - 3}
               </span>
             )}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

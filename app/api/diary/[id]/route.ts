@@ -66,6 +66,117 @@ export async function GET(
   }
 }
 
+// PATCH: 일기 수정
+export async function PATCH(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const params = await context.params;
+  try {
+    const supabase = await createServerSupabaseClient();
+    
+    // 사용자 인증 확인
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { summary, transcript, keywords } = body;
+
+    // 일기 소유권 확인
+    const { data: existingDiary, error: checkError } = await supabase
+      .from('diary_entries')
+      .select('id')
+      .eq('id', params.id)
+      .eq('user_id', user.id)
+      .single();
+
+    if (checkError || !existingDiary) {
+      return NextResponse.json({ error: '일기를 찾을 수 없습니다.' }, { status: 404 });
+    }
+
+    // 일기 본문 업데이트
+    const { error: updateError } = await supabase
+      .from('diary_entries')
+      .update({
+        summary,
+        transcript,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', params.id);
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    // 키워드 업데이트 (기존 삭제 후 새로 추가)
+    if (keywords && Array.isArray(keywords)) {
+      // 기존 키워드 삭제
+      await supabase
+        .from('keywords')
+        .delete()
+        .eq('diary_entry_id', params.id);
+
+      // 새 키워드 추가
+      if (keywords.length > 0) {
+        const keywordData = keywords.map((keyword: string) => ({
+          diary_entry_id: params.id,
+          keyword,
+        }));
+
+        await supabase
+          .from('keywords')
+          .insert(keywordData);
+      }
+    }
+
+    // 업데이트된 일기 다시 조회
+    const { data: updatedDiary, error: fetchError } = await supabase
+      .from('diary_entries')
+      .select(`
+        *,
+        emotions (
+          type,
+          score
+        ),
+        keywords (
+          keyword
+        )
+      `)
+      .eq('id', params.id)
+      .single();
+
+    if (fetchError || !updatedDiary) {
+      throw fetchError || new Error('업데이트된 일기를 불러올 수 없습니다.');
+    }
+
+    const diaryEntry = {
+      id: updatedDiary.id,
+      userId: updatedDiary.user_id,
+      date: new Date(updatedDiary.date),
+      audioUrl: updatedDiary.audio_url,
+      transcript: updatedDiary.transcript,
+      summary: updatedDiary.summary,
+      emotions: updatedDiary.emotions.map((e: { type: '기쁨' | '슬픔' | '불안' | '분노' | '평온' | '기대' | '놀람'; score: number }) => ({
+        type: e.type,
+        score: e.score,
+      })),
+      keywords: updatedDiary.keywords.map((k: { keyword: string }) => k.keyword),
+      createdAt: new Date(updatedDiary.created_at),
+      updatedAt: new Date(updatedDiary.updated_at),
+    };
+
+    return NextResponse.json({ diary: diaryEntry });
+  } catch (error) {
+    console.error('일기 수정 오류:', error);
+    return NextResponse.json(
+      { error: '일기 수정 중 오류가 발생했습니다.' },
+      { status: 500 }
+    );
+  }
+}
+
 // DELETE: 일기 삭제
 export async function DELETE(
   request: NextRequest,

@@ -48,6 +48,19 @@ export function Calendar({ selectedDate, onDateSelect, diaryDates, diaries = [],
     )
   }
 
+  const getEmotionEmoji = (emotion: string) => {
+    const emojiMap: Record<string, string> = {
+      '기쁨': '😊',
+      '슬픔': '😢',
+      '불안': '😰',
+      '분노': '😠',
+      '평온': '😌',
+      '기대': '🤗',
+      '놀람': '😮'
+    }
+    return emojiMap[emotion] || '📝'
+  }
+
   return (
     <div className={cn('bg-white rounded-2xl shadow-sm', className)}>
       {/* 헤더 */}
@@ -109,56 +122,40 @@ export function Calendar({ selectedDate, onDateSelect, diaryDates, diaries = [],
               key={date.toISOString()}
               onClick={() => onDateSelect(date)}
               className={cn(
-                'aspect-square relative flex flex-col items-center justify-center rounded-xl transition-all',
+                'aspect-square relative rounded-xl transition-all p-1',
                 'hover:bg-gray-50 active:scale-95',
-                isSelected && 'bg-gray-900 hover:bg-gray-800',
-                isTodayDate && !isSelected && 'bg-green-50 text-green-600 font-semibold',
-                isDiaryDate && !isSelected && !isTodayDate && 'bg-gray-50'
+                isTodayDate && 'bg-green-50',
+                isDiaryDate && !isTodayDate && 'bg-gray-50'
               )}
             >
               <span className={cn(
-                "text-sm font-medium mb-1",
-                isSelected && 'text-white',
-                dayOfWeek === 0 && !isSelected && 'text-red-400',
-                dayOfWeek === 6 && !isSelected && 'text-blue-400',
-                !isSelected && dayOfWeek !== 0 && dayOfWeek !== 6 && !isTodayDate && 'text-gray-700'
+                "absolute top-1 left-1.5 text-sm font-medium",
+                dayOfWeek === 0 && 'text-red-400',
+                dayOfWeek === 6 && 'text-blue-400',
+                dayOfWeek !== 0 && dayOfWeek !== 6 && 'text-gray-700',
+                isTodayDate && 'font-semibold'
               )}>
                 {format(date, 'd')}
               </span>
               {isDiaryDate && dateDiaries.length > 0 && (
-                <div className="absolute bottom-1">
-                  <div className="flex gap-0.5">
-                    {dateDiaries.length === 1 ? (
-                      <div className={cn(
-                        "w-1 h-1 rounded-full",
-                        isSelected ? 'bg-white' : 'bg-green-500'
-                      )} />
-                    ) : dateDiaries.length === 2 ? (
-                      <>
-                        <div className={cn(
-                          "w-1 h-1 rounded-full",
-                          isSelected ? 'bg-white' : 'bg-green-500'
-                        )} />
-                        <div className={cn(
-                          "w-1 h-1 rounded-full",
-                          isSelected ? 'bg-white' : 'bg-green-500'
-                        )} />
-                      </>
-                    ) : (
-                      <>
-                        <div className={cn(
-                          "w-1 h-1 rounded-full",
-                          isSelected ? 'bg-white' : 'bg-green-500'
-                        )} />
-                        <div className={cn(
-                          "w-1 h-1 rounded-full",
-                          isSelected ? 'bg-white' : 'bg-green-500'
-                        )} />
-                        <div className={cn(
-                          "w-1 h-1 rounded-full",
-                          isSelected ? 'bg-white' : 'bg-green-500'
-                        )} />
-                      </>
+                <div className="absolute inset-0 flex items-center justify-center pt-3">
+                  <div className="flex flex-wrap gap-0.5 justify-center max-w-full px-1">
+                    {dateDiaries.slice(0, 2).map((diary, idx) => {
+                      const mainEmotion = diary.emotions?.[0]
+                      return (
+                        <span 
+                          key={idx} 
+                          className="text-base"
+                          title={diary.summary || '일기'}
+                        >
+                          {mainEmotion ? getEmotionEmoji(mainEmotion.type) : '📝'}
+                        </span>
+                      )
+                    })}
+                    {dateDiaries.length > 2 && (
+                      <span className="text-xs text-gray-500 font-medium">
+                        +{dateDiaries.length - 2}
+                      </span>
                     )}
                   </div>
                 </div>

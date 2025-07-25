@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { MobileLayout } from '@/components/layout/mobile-layout'
 import { DiaryCard } from '@/components/diary/diary-card'
+import { DiaryEntry } from '@/types'
 import { Calendar } from '@/components/diary/calendar'
 import { useDiary } from '@/hooks/useDiary'
 import {
@@ -11,10 +12,12 @@ import {
   Plus,
   Calendar as CalendarIcon,
   List,
+  X,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
+import { ko } from 'date-fns/locale'
 import { cn } from '@/lib/utils'
 
 type ViewMode = 'list' | 'calendar'
@@ -26,6 +29,8 @@ export default function DiaryPage() {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [viewMode, setViewMode] = useState<ViewMode>('list')
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const [showDiarySelection, setShowDiarySelection] = useState(false)
+  const [selectedDateDiaries, setSelectedDateDiaries] = useState<DiaryEntry[]>([])
   const year = currentDate.getFullYear()
   const month = currentDate.getMonth() + 1
 
@@ -53,12 +58,18 @@ export default function DiaryPage() {
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date)
     // 선택한 날짜의 일기 찾기
-    const diary = diaries.find(
+    const dateDiaries = diaries.filter(
       (d) =>
         format(new Date(d.date), 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd'),
     )
-    if (diary) {
-      handleDiaryClick(diary.id)
+    
+    if (dateDiaries.length === 1) {
+      // 일기가 하나만 있으면 바로 이동
+      handleDiaryClick(dateDiaries[0].id)
+    } else if (dateDiaries.length > 1) {
+      // 일기가 여러 개 있으면 선택 화면 표시
+      setSelectedDateDiaries(dateDiaries)
+      setShowDiarySelection(true)
     }
   }
 
@@ -177,6 +188,67 @@ export default function DiaryPage() {
         >
           <Plus className="h-6 w-6 text-white" />
         </button>
+      )}
+
+      {/* 일기 선택 모달 */}
+      {showDiarySelection && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md max-h-[80vh] overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-gray-100">
+              <h3 className="text-lg font-medium text-gray-900">
+                {selectedDate && format(selectedDate, 'yyyy년 M월 d일', { locale: ko })}
+              </h3>
+              <button
+                onClick={() => {
+                  setShowDiarySelection(false)
+                  setSelectedDateDiaries([])
+                }}
+                className="p-2 -m-2 hover:bg-gray-50 rounded-full transition-all"
+              >
+                <X className="h-5 w-5 text-gray-600" />
+              </button>
+            </div>
+            <div className="p-4 space-y-3 overflow-y-auto max-h-[calc(80vh-80px)]">
+              {selectedDateDiaries.map((diary, index) => (
+                <button
+                  key={diary.id}
+                  onClick={() => {
+                    handleDiaryClick(diary.id)
+                    setShowDiarySelection(false)
+                    setSelectedDateDiaries([])
+                  }}
+                  className="w-full p-4 bg-gray-50 hover:bg-gray-100 rounded-xl text-left transition-all active:scale-[0.98]">
+                  <div className="flex items-start justify-between mb-2">
+                    <p className="text-sm font-medium text-gray-900">
+                      {index + 1}번째 일기
+                    </p>
+                    <div className="flex gap-1">
+                      {diary.emotions?.slice(0, 2).map((emotion, idx) => {
+                        const emojiMap: Record<string, string> = {
+                          '기쁨': '😊',
+                          '슬픔': '😢',
+                          '불안': '😰',
+                          '분노': '😠',
+                          '평온': '😌',
+                          '기대': '🤗',
+                          '놀람': '😮'
+                        }
+                        return (
+                          <span key={idx} className="text-base">
+                            {emojiMap[emotion.type] || '📝'}
+                          </span>
+                        )
+                      })}
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600 line-clamp-2">
+                    {diary.summary}
+                  </p>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
       )}
     </MobileLayout>
   )

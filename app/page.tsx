@@ -3,7 +3,6 @@
 import { MobileLayout } from '@/components/layout/mobile-layout'
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'
 import { MicrophonePermission } from '@/components/ui/microphone-permission'
-import { Card } from '@/components/ui/card'
 import { Mic, Calendar, Brain, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -38,66 +37,72 @@ export default function Home() {
   return (
     <MobileLayout>
       <MicrophonePermission />
-      <div className="px-4 py-6 space-y-6">
+      <div className="px-4 py-6 space-y-5 bg-gray-50 min-h-screen">
         {/* 인사말 섹션 */}
-        <section className="text-center py-8">
-          <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-            {user ? `안녕하세요, ${user.user_metadata?.name || user.email?.split('@')[0] || ''}님!` : '안녕하세요!'} 👋
+        <section className="text-center py-6">
+          <h1 className="text-xl font-medium text-gray-900">
+            {user ? `안녕하세요, ${user.user_metadata?.name || user.email?.split('@')[0] || ''}님` : '안녕하세요'}
           </h1>
-          <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+          <p className="mt-1 text-sm text-gray-500">
             {today}
           </p>
-          <p className="mt-4 text-base text-neutral-700 dark:text-neutral-300">
+          <p className="mt-3 text-base text-gray-700">
             오늘의 이야기를 들려주세요
           </p>
         </section>
 
         {/* 빠른 녹음 버튼 */}
         <Link href="/record" className="block">
-          <Card className="p-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 shadow-xl hover:shadow-2xl transform transition-all hover:scale-[1.02]">
+          <div className="p-6 bg-gray-900 text-white rounded-2xl shadow-sm hover:shadow-md transform transition-all active:scale-[0.98]">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold">오늘의 일기 녹음하기</h2>
-                <p className="text-sm text-white/90 mt-1">
+                <h2 className="text-lg font-medium">오늘의 일기 녹음하기</h2>
+                <p className="text-sm text-gray-300 mt-1">
                   음성으로 편하게 기록해보세요
                 </p>
               </div>
-              <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center">
                 <Mic className="w-6 h-6" />
               </div>
             </div>
-          </Card>
+          </div>
         </Link>
 
         {/* 기능 카드들 */}
-        <section className="grid grid-cols-2 gap-4">
+        <section className="grid grid-cols-2 gap-3">
           <Link href="/diary">
-            <Card className="p-4 hover:shadow-lg hover:border-purple-300 dark:hover:border-purple-700 transition-all transform hover:scale-[1.02]">
-              <Calendar className="w-6 h-6 text-purple-500 mb-3" />
-              <h3 className="font-medium text-sm">지난 일기</h3>
-              <p className="text-xs text-neutral-500 mt-1">기록된 일기 보기</p>
-            </Card>
+            <div className="p-5 bg-white rounded-2xl border border-gray-100 hover:shadow-md transition-all active:scale-[0.98]">
+              <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center mb-3">
+                <Calendar className="w-5 h-5 text-green-600" />
+              </div>
+              <h3 className="font-medium text-sm text-gray-900">지난 일기</h3>
+              <p className="text-xs text-gray-500 mt-1">기록된 일기 보기</p>
+            </div>
           </Link>
 
           <Link href="/insights">
-            <Card className="p-4 hover:shadow-lg hover:border-purple-300 dark:hover:border-purple-700 transition-all transform hover:scale-[1.02]">
-              <Brain className="w-6 h-6 text-purple-500 mb-3" />
-              <h3 className="font-medium text-sm">감정 분석</h3>
-              <p className="text-xs text-neutral-500 mt-1">AI 인사이트</p>
-            </Card>
+            <div className="p-5 bg-white rounded-2xl border border-gray-100 hover:shadow-md transition-all active:scale-[0.98]">
+              <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mb-3">
+                <Brain className="w-5 h-5 text-blue-600" />
+              </div>
+              <h3 className="font-medium text-sm text-gray-900">감정 분석</h3>
+              <p className="text-xs text-gray-500 mt-1">AI 인사이트</p>
+            </div>
           </Link>
         </section>
 
         {/* 최근 감정 트렌드 미리보기 */}
-        <Card className="p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-medium text-sm">이번 주 감정 변화</h3>
-            <TrendingUp className="w-4 h-4 text-neutral-400" />
+        <div className="p-5 bg-white rounded-2xl border border-gray-100">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-medium text-sm text-gray-900">이번 주 감정 변화</h3>
+            <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center">
+              <TrendingUp className="w-4 h-4 text-gray-600" />
+            </div>
           </div>
-          <div className="h-20 bg-neutral-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center">
-            <p className="text-xs text-neutral-500">아직 기록된 일기가 없어요</p>
+          <div className="h-24 bg-gray-50 rounded-xl flex items-center justify-center">
+            <p className="text-sm text-gray-500">아직 기록된 일기가 없어요</p>
           </div>
-        </Card>
+        </div>
       </div>
       
       <PWAInstallPrompt />

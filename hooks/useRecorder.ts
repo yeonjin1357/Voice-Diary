@@ -25,6 +25,7 @@ export function useRecorder(): UseRecorderReturn {
   const startTimeRef = useRef<number | null>(null)
   const analyserRef = useRef<AnalyserNode | null>(null)
   const audioContextRef = useRef<AudioContext | null>(null)
+  const timerIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   const updateAudioLevel = useCallback(() => {
     if (!analyserRef.current) return
@@ -40,16 +41,31 @@ export function useRecorder(): UseRecorderReturn {
     }
   }, [isRecording, isPaused])
 
-  const updateRecordingTime = useCallback(() => {
-    if (!startTimeRef.current || isPaused) return
-    
-    const elapsed = Date.now() - startTimeRef.current
-    setRecordingTime(Math.floor(elapsed / 1000))
-    
-    if (isRecording && !isPaused) {
-      setTimeout(updateRecordingTime, 100)
+  const startTimer = useCallback(() => {
+    console.log('Starting timer...')
+    if (timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current)
     }
-  }, [isRecording, isPaused])
+    
+    startTimeRef.current = Date.now()
+    setRecordingTime(0)
+    
+    timerIntervalRef.current = setInterval(() => {
+      if (!startTimeRef.current || isPaused) return
+      
+      const elapsed = Date.now() - startTimeRef.current
+      const seconds = Math.floor(elapsed / 1000)
+      console.log('Timer update:', seconds)
+      setRecordingTime(seconds)
+    }, 100)
+  }, [isPaused])
+  
+  const stopTimer = useCallback(() => {
+    if (timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current)
+      timerIntervalRef.current = null
+    }
+  }, [])
 
   const startRecording = async () => {
     try {
@@ -133,10 +149,10 @@ export function useRecorder(): UseRecorderReturn {
       mediaRecorderRef.current.start(100) // Collect data every 100ms
       setIsRecording(true)
       setIsPaused(false)
-      startTimeRef.current = Date.now()
       
+      console.log('Recording started, calling startTimer...')
+      startTimer()
       updateAudioLevel()
-      updateRecordingTime()
     } catch (error) {
       console.error('Error starting recording:', error)
       throw error
@@ -161,6 +177,7 @@ export function useRecorder(): UseRecorderReturn {
         }
         audioContextRef.current?.close()
         
+        stopTimer()
         setIsRecording(false)
         setIsPaused(false)
         setRecordingTime(0)
@@ -181,6 +198,11 @@ export function useRecorder(): UseRecorderReturn {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
       }
+      // 일시정지 시점의 경과 시간 저장
+      if (startTimeRef.current) {
+        const elapsed = Date.now() - startTimeRef.current
+        startTimeRef.current = Date.now() - elapsed // 재개 시 이어서 계산할 수 있도록
+      }
     }
   }
 
@@ -189,7 +211,6 @@ export function useRecorder(): UseRecorderReturn {
       mediaRecorderRef.current.resume()
       setIsPaused(false)
       updateAudioLevel()
-      updateRecordingTime()
     }
   }
 

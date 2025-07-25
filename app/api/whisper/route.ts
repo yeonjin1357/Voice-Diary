@@ -49,13 +49,14 @@ export async function POST(request: NextRequest) {
         transcript: transcription,
         success: true,
       })
-    } catch (apiError: any) {
+    } catch (apiError) {
       // API 에러 상세 정보 로깅
+      const error = apiError as Error & { status?: number; code?: string; type?: string }
       console.error('OpenAI API 상세 오류:', {
-        message: apiError.message,
-        status: apiError.status,
-        code: apiError.code,
-        type: apiError.type,
+        message: error.message,
+        status: error.status,
+        code: error.code,
+        type: error.type,
       })
 
       throw apiError

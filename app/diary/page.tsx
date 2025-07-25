@@ -19,6 +19,7 @@ import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import { cn } from '@/lib/utils'
+import { SearchFilter, SearchFilterValues } from '@/components/diary/search-filter'
 
 type ViewMode = 'list' | 'calendar'
 
@@ -31,20 +32,43 @@ export default function DiaryPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [showDiarySelection, setShowDiarySelection] = useState(false)
   const [selectedDateDiaries, setSelectedDateDiaries] = useState<DiaryEntry[]>([])
+  const [, setFilterValues] = useState<SearchFilterValues>({
+    keyword: '',
+    emotion: null,
+    startDate: null,
+    endDate: null,
+  })
+  const [isFiltering, setIsFiltering] = useState(false)
   const year = currentDate.getFullYear()
   const month = currentDate.getMonth() + 1
 
   useEffect(() => {
-    fetchDiaries(year, month)
+    if (!isFiltering) {
+      fetchDiaries(year, month)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [year, month])
+  }, [year, month, isFiltering])
 
   const handlePreviousMonth = () => {
     setCurrentDate(new Date(year, month - 2, 1))
+    setIsFiltering(false) // 월 변경 시 필터 초기화
+    setFilterValues({
+      keyword: '',
+      emotion: null,
+      startDate: null,
+      endDate: null,
+    })
   }
 
   const handleNextMonth = () => {
     setCurrentDate(new Date(year, month, 1))
+    setIsFiltering(false) // 월 변경 시 필터 초기화
+    setFilterValues({
+      keyword: '',
+      emotion: null,
+      startDate: null,
+      endDate: null,
+    })
   }
 
   const handleDiaryClick = (diaryId: string) => {
@@ -70,6 +94,20 @@ export default function DiaryPage() {
       // 일기가 여러 개 있으면 선택 화면 표시
       setSelectedDateDiaries(dateDiaries)
       setShowDiarySelection(true)
+    }
+  }
+
+  const handleFilterChange = async (filters: SearchFilterValues) => {
+    setFilterValues(filters)
+    const hasFilters = !!(filters.keyword || filters.emotion || filters.startDate || filters.endDate)
+    setIsFiltering(hasFilters)
+    
+    if (hasFilters) {
+      // 필터링된 결과 가져오기
+      await fetchDiaries(year, month, filters)
+    } else {
+      // 필터가 없으면 현재 월의 모든 일기 표시
+      await fetchDiaries(year, month)
     }
   }
 
@@ -141,6 +179,12 @@ export default function DiaryPage() {
   return (
     <MobileLayout header={header}>
       <div className="px-4 py-4">
+        {/* 검색 및 필터 컴포넌트 */}
+        <SearchFilter 
+          onFilterChange={handleFilterChange}
+          totalCount={diaries.length}
+        />
+        
         {loading ? (
           <div className="flex h-64 items-center justify-center">
             <p className="text-neutral-500">일기를 불러오는 중...</p>
@@ -152,12 +196,16 @@ export default function DiaryPage() {
               다시 시도
             </Button>
           </div>
-        ) : diaries.length === 0 && viewMode === 'list' ? (
+        ) : diaries.length === 0 ? (
           <div className="flex h-64 flex-col items-center justify-center space-y-4">
-            <p className="text-neutral-500">이번 달에 작성한 일기가 없습니다</p>
-            <Button onClick={handleNewDiary}>
-              <Plus className="mr-2 h-4 w-4" />첫 일기 작성하기
-            </Button>
+            <p className="text-neutral-500">
+              {isFiltering ? '검색 결과가 없습니다' : '이번 달에 작성한 일기가 없습니다'}
+            </p>
+            {!isFiltering && (
+              <Button onClick={handleNewDiary}>
+                <Plus className="mr-2 h-4 w-4" />첫 일기 작성하기
+              </Button>
+            )}
           </div>
         ) : viewMode === 'calendar' ? (
           <Calendar

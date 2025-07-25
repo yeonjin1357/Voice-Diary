@@ -13,10 +13,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
     }
 
-    // URL 파라미터에서 월/년 추출
+    // URL 파라미터에서 검색 조건 추출
     const { searchParams } = new URL(request.url);
     const year = searchParams.get('year');
     const month = searchParams.get('month');
+    const keyword = searchParams.get('keyword');
+    const emotion = searchParams.get('emotion');
+    const startDate = searchParams.get('startDate');
+    const endDate = searchParams.get('endDate');
     
     let query = supabase
       .from('diary_entries')
@@ -33,11 +37,40 @@ export async function GET(request: NextRequest) {
       .eq('user_id', user.id)
       .order('date', { ascending: false });
 
-    // 월별 필터링
-    if (year && month) {
-      const startDate = `${year}-${month.padStart(2, '0')}-01`;
-      const endDate = new Date(parseInt(year), parseInt(month), 0).toISOString().split('T')[0];
+    // 키워드 검색
+    if (keyword) {
+      query = query.or(`transcript.ilike.%${keyword}%,summary.ilike.%${keyword}%`);
+    }
+
+    // 감정 필터링
+    if (emotion) {
+      // 서브쿼리로 특정 감정을 가진 일기 ID들을 먼저 찾음
+      const { data: emotionEntries } = await supabase
+        .from('emotions')
+        .select('diary_entry_id')
+        .eq('type', emotion);
+      
+      if (emotionEntries && emotionEntries.length > 0) {
+        const diaryIds = emotionEntries.map(e => e.diary_entry_id);
+        query = query.in('id', diaryIds);
+      } else {
+        // 해당 감정을 가진 일기가 없으면 빈 결과 반환
+        return NextResponse.json({ diaries: [] });
+      }
+    }
+
+    // 날짜 범위 필터링
+    if (startDate && endDate) {
       query = query.gte('date', startDate).lte('date', endDate);
+    } else if (startDate) {
+      query = query.gte('date', startDate);
+    } else if (endDate) {
+      query = query.lte('date', endDate);
+    } else if (year && month) {
+      // 기존 월별 필터링
+      const monthStartDate = `${year}-${month.padStart(2, '0')}-01`;
+      const monthEndDate = new Date(parseInt(year), parseInt(month), 0).toISOString().split('T')[0];
+      query = query.gte('date', monthStartDate).lte('date', monthEndDate);
     }
 
     const { data, error } = await query;

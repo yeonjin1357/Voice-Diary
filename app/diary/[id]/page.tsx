@@ -205,21 +205,21 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
   }
 
   const header = (
-    <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-100">
+    <div className="flex items-center justify-between border-b border-gray-100 bg-white px-4 py-3">
       <button
         onClick={() => router.back()}
-        className="p-2 -m-2 hover:bg-gray-50 rounded-full transition-all active:scale-95"
+        className="-m-2 rounded-full p-2 transition-all hover:bg-gray-50 active:scale-95"
       >
         <ArrowLeft className="h-5 w-5 text-gray-600" />
       </button>
 
       <h1 className="text-lg font-medium text-gray-900">일기 상세</h1>
 
-      <div className="flex gap-1">
+      <div className="flex gap-4">
         {!isEditing && (
           <button
             onClick={handleEdit}
-            className="p-2 -m-2 hover:bg-gray-50 rounded-full transition-all active:scale-95"
+            className="-m-2 rounded-full p-2 transition-all hover:bg-gray-50 active:scale-95"
           >
             <Edit className="h-5 w-5 text-gray-600" />
           </button>
@@ -227,7 +227,7 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
         <button
           onClick={handleDelete}
           disabled={isDeleting}
-          className="p-2 -m-2 hover:bg-red-50 rounded-full transition-all active:scale-95 text-red-500 hover:text-red-600"
+          className="-m-2 rounded-full p-2 text-red-500 transition-all hover:bg-red-50 hover:text-red-600 active:scale-95"
         >
           <Trash2 className="h-5 w-5" />
         </button>
@@ -250,9 +250,9 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
       <MobileLayout header={header}>
         <div className="flex h-64 flex-col items-center justify-center space-y-4">
           <p className="text-red-500">{error || '일기를 찾을 수 없습니다.'}</p>
-          <button 
+          <button
             onClick={() => router.push('/diary')}
-            className="px-4 py-2 bg-gray-900 text-white font-medium rounded-xl hover:bg-gray-800 transition-all active:scale-[0.98]"
+            className="rounded-xl bg-gray-900 px-4 py-2 font-medium text-white transition-all hover:bg-gray-800 active:scale-[0.98]"
           >
             목록으로 돌아가기
           </button>
@@ -263,22 +263,26 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
 
   return (
     <MobileLayout header={header}>
-      <div className="space-y-4 px-4 py-4 bg-gray-50 min-h-screen">
+      <div className="min-h-screen space-y-4 bg-gray-50 px-4 py-4">
         {/* 날짜 정보 */}
-        <div className="bg-white rounded-2xl p-5 border border-gray-100">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-100">
               <Calendar className="h-5 w-5 text-gray-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900">{formatDate(diary.date)}</p>
-              <p className="text-xs text-gray-500">{getDayOfWeek(diary.date)}</p>
+              <p className="text-sm font-medium text-gray-900">
+                {formatDate(diary.date)}
+              </p>
+              <p className="text-xs text-gray-500">
+                {getDayOfWeek(diary.date)}
+              </p>
             </div>
           </div>
         </div>
 
         {/* 감정 분석 */}
-        <div className="bg-white rounded-2xl p-5 border border-gray-100">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5">
           <h2 className="mb-4 font-medium text-gray-900">오늘의 감정</h2>
           <div className="space-y-3">
             {diary.emotions.map((emotion) => (
@@ -286,10 +290,12 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
                 key={emotion.type}
                 className="flex items-center justify-between"
               >
-                <span className={cn(
-                  'inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border',
-                  emotionColors[emotion.type]
-                )}>
+                <span
+                  className={cn(
+                    'inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-medium',
+                    emotionColors[emotion.type],
+                  )}
+                >
                   {emotion.type}
                 </span>
                 <div className="flex items-center gap-3">
@@ -297,7 +303,7 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
                     <div
                       className={cn(
                         'h-2 rounded-full bg-gradient-to-r',
-                        emotionGradients[emotion.type]
+                        emotionGradients[emotion.type],
                       )}
                       style={{ width: `${emotion.score}%` }}
                     />
@@ -312,17 +318,17 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
         </div>
 
         {/* 요약 */}
-        <div className="bg-white rounded-2xl p-5 border border-gray-100">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5">
           <h2 className="mb-3 font-medium text-gray-900">요약</h2>
           {isEditing ? (
             <Textarea
               value={editedSummary}
               onChange={(e) => setEditedSummary(e.target.value)}
-              className="min-h-[80px] text-sm border-gray-200 focus:border-gray-400 focus:ring-1 focus:ring-gray-400"
+              className="min-h-[80px] border-gray-200 text-sm focus:border-gray-400 focus:ring-1 focus:ring-gray-400"
               placeholder="요약을 입력하세요"
             />
           ) : (
-            <p className="text-sm text-gray-700 leading-relaxed">
+            <p className="text-sm leading-relaxed text-gray-700">
               {diary.summary}
             </p>
           )}
@@ -330,16 +336,16 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
 
         {/* 음성 재생 */}
         {diary.audioUrl && (
-          <div className="bg-white rounded-2xl p-5 border border-gray-100">
+          <div className="rounded-2xl border border-gray-100 bg-white p-5">
             <div className="flex items-center justify-between">
               <h2 className="font-medium text-gray-900">음성 녹음</h2>
               <button
                 onClick={toggleAudioPlayback}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all active:scale-95",
-                  isPlaying 
-                    ? "bg-gray-900 text-white hover:bg-gray-800" 
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  'flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all active:scale-95',
+                  isPlaying
+                    ? 'bg-gray-900 text-white hover:bg-gray-800'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
                 )}
               >
                 {isPlaying ? (
@@ -359,17 +365,17 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
         )}
 
         {/* 일기 내용 */}
-        <div className="bg-white rounded-2xl p-5 border border-gray-100">
+        <div className="rounded-2xl border border-gray-100 bg-white p-5">
           <h2 className="mb-3 font-medium text-gray-900">일기 내용</h2>
           {isEditing ? (
             <Textarea
               value={editedTranscript}
               onChange={(e) => setEditedTranscript(e.target.value)}
-              className="min-h-[200px] text-sm border-gray-200 focus:border-gray-400 focus:ring-1 focus:ring-gray-400"
+              className="min-h-[200px] border-gray-200 text-sm focus:border-gray-400 focus:ring-1 focus:ring-gray-400"
               placeholder="일기 내용을 입력하세요"
             />
           ) : (
-            <p className="text-sm whitespace-pre-wrap text-gray-700 leading-relaxed">
+            <p className="text-sm leading-relaxed whitespace-pre-wrap text-gray-700">
               {diary.transcript}
             </p>
           )}
@@ -377,7 +383,7 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
 
         {/* 키워드 */}
         {(diary.keywords.length > 0 || isEditing) && (
-          <div className="bg-white rounded-2xl p-5 border border-gray-100">
+          <div className="rounded-2xl border border-gray-100 bg-white p-5">
             <h2 className="mb-3 font-medium text-gray-900">키워드</h2>
             {isEditing ? (
               <div className="space-y-3">
@@ -391,7 +397,7 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
                       <span className="text-gray-700">{keyword}</span>
                       <button
                         onClick={() => handleKeywordRemove(keyword)}
-                        className="ml-1 text-gray-400 hover:text-red-500 transition-colors"
+                        className="ml-1 text-gray-400 transition-colors hover:text-red-500"
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -417,7 +423,7 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
                       handleKeywordAdd(newKeyword)
                       setNewKeyword('')
                     }}
-                    className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all active:scale-95"
+                    className="rounded-lg bg-gray-100 px-3 py-2 transition-all hover:bg-gray-200 active:scale-95"
                   >
                     <Plus className="h-4 w-4 text-gray-600" />
                   </button>
@@ -445,14 +451,14 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
         <div className="sticky right-0 bottom-0 left-0 flex gap-3 border-t bg-white p-4 shadow-lg">
           <button
             onClick={handleCancelEdit}
-            className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-all active:scale-[0.98] disabled:opacity-50"
+            className="flex-1 rounded-xl bg-gray-100 px-4 py-3 font-medium text-gray-700 transition-all hover:bg-gray-200 active:scale-[0.98] disabled:opacity-50"
             disabled={isSaving}
           >
             취소
           </button>
           <button
             onClick={handleSaveEdit}
-            className="flex-1 py-3 px-4 bg-gray-900 text-white font-medium rounded-xl hover:bg-gray-800 transition-all active:scale-[0.98] disabled:opacity-50"
+            className="flex-1 rounded-xl bg-gray-900 px-4 py-3 font-medium text-white transition-all hover:bg-gray-800 active:scale-[0.98] disabled:opacity-50"
             disabled={isSaving}
           >
             {isSaving ? '저장 중...' : '저장'}

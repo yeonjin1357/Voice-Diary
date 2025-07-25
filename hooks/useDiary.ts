@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { DiaryEntry } from '@/types'
+import { SearchFilterValues } from '@/components/diary/search-filter'
 
 export function useDiary() {
   const [diaries, setDiaries] = useState<DiaryEntry[]>([])
@@ -10,7 +11,7 @@ export function useDiary() {
   const [error, setError] = useState<string | null>(null)
   const supabase = createClient()
 
-  const fetchDiaries = async (year?: number, month?: number) => {
+  const fetchDiaries = async (year?: number, month?: number, filters?: SearchFilterValues) => {
     try {
       setLoading(true)
       setError(null)
@@ -18,6 +19,12 @@ export function useDiary() {
       const params = new URLSearchParams()
       if (year) params.append('year', year.toString())
       if (month) params.append('month', month.toString())
+      
+      // 필터 파라미터 추가
+      if (filters?.keyword) params.append('keyword', filters.keyword)
+      if (filters?.emotion) params.append('emotion', filters.emotion)
+      if (filters?.startDate) params.append('startDate', filters.startDate.toISOString().split('T')[0])
+      if (filters?.endDate) params.append('endDate', filters.endDate.toISOString().split('T')[0])
 
       const response = await fetch(`/api/diary?${params}`)
       if (!response.ok) throw new Error('일기를 불러오는데 실패했습니다.')

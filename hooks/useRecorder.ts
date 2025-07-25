@@ -51,14 +51,14 @@ export function useRecorder(): UseRecorderReturn {
     setRecordingTime(0)
     
     timerIntervalRef.current = setInterval(() => {
-      if (!startTimeRef.current || isPaused) return
+      if (!startTimeRef.current) return
       
       const elapsed = Date.now() - startTimeRef.current
       const seconds = Math.floor(elapsed / 1000)
       console.log('Timer update:', seconds)
       setRecordingTime(seconds)
     }, 100)
-  }, [isPaused])
+  }, [])
   
   const stopTimer = useCallback(() => {
     if (timerIntervalRef.current) {
@@ -198,10 +198,12 @@ export function useRecorder(): UseRecorderReturn {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
       }
+      // 타이머 일시정지
+      stopTimer()
       // 일시정지 시점의 경과 시간 저장
       if (startTimeRef.current) {
         const elapsed = Date.now() - startTimeRef.current
-        startTimeRef.current = Date.now() - elapsed // 재개 시 이어서 계산할 수 있도록
+        startTimeRef.current = elapsed // 재개 시 이어서 계산할 수 있도록 저장
       }
     }
   }
@@ -210,6 +212,19 @@ export function useRecorder(): UseRecorderReturn {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'paused') {
       mediaRecorderRef.current.resume()
       setIsPaused(false)
+      // 타이머 재개 (이전에 저장한 경과 시간부터 시작)
+      if (startTimeRef.current) {
+        const previousElapsed = startTimeRef.current
+        startTimeRef.current = Date.now() - previousElapsed
+        
+        timerIntervalRef.current = setInterval(() => {
+          if (!startTimeRef.current) return
+          
+          const elapsed = Date.now() - startTimeRef.current
+          const seconds = Math.floor(elapsed / 1000)
+          setRecordingTime(seconds)
+        }, 100)
+      }
       updateAudioLevel()
     }
   }

@@ -50,6 +50,7 @@ export default function RecordPage() {
     const blob = await stopRecording()
     if (blob) {
       setAudioBlob(blob)
+      toast.success('녹음이 완료되었습니다! 저장 버튼을 눌러 일기를 작성하세요.')
     }
   }
 
@@ -208,14 +209,19 @@ export default function RecordPage() {
             )}
 
             {audioBlob && !isRecording && (
-              <Button
-                size="lg"
-                onClick={handleSave}
-                disabled={isProcessing}
-                className="rounded-full w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg transform transition-all hover:scale-105"
-              >
-                <Send className="w-6 h-6" />
-              </Button>
+              <div className="flex flex-col items-center gap-2">
+                <Button
+                  size="lg"
+                  onClick={handleSave}
+                  disabled={isProcessing}
+                  className="rounded-full w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg transform transition-all hover:scale-105"
+                >
+                  <Send className="w-6 h-6" />
+                </Button>
+                <p className="text-xs text-neutral-500">
+                  {isProcessing ? '처리 중...' : '저장하기'}
+                </p>
+              </div>
             )}
           </div>
         </div>

@@ -79,6 +79,7 @@ export async function POST(request: NextRequest) {
     // 사용자 인증 확인
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
+      console.error('인증 오류:', authError);
       return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
     }
 
@@ -106,7 +107,10 @@ export async function POST(request: NextRequest) {
       .select()
       .single();
 
-    if (diaryError) throw diaryError;
+    if (diaryError) {
+      console.error('일기 저장 실패:', diaryError);
+      throw diaryError;
+    }
 
     // 감정 데이터 저장
     if (emotions && emotions.length > 0) {
@@ -120,7 +124,10 @@ export async function POST(request: NextRequest) {
         .from('emotions')
         .insert(emotionData);
 
-      if (emotionError) throw emotionError;
+      if (emotionError) {
+        console.error('감정 데이터 저장 실패:', emotionError);
+        throw emotionError;
+      }
     }
 
     // 키워드 데이터 저장
@@ -134,7 +141,10 @@ export async function POST(request: NextRequest) {
         .from('keywords')
         .insert(keywordData);
 
-      if (keywordError) throw keywordError;
+      if (keywordError) {
+        console.error('키워드 데이터 저장 실패:', keywordError);
+        throw keywordError;
+      }
     }
 
     return NextResponse.json({

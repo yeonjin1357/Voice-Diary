@@ -5,7 +5,7 @@ import { MobileLayout } from '@/components/layout/mobile-layout'
 import { useRecorder } from '@/hooks/useRecorder'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Mic, Square, Pause, Play, Send } from 'lucide-react'
+import { Mic, Square, Pause, Play, Send, RotateCcw } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
@@ -20,6 +20,7 @@ export default function RecordPage() {
     stopRecording,
     pauseRecording,
     resumeRecording,
+    resetRecording,
     audioLevel,
   } = useRecorder()
   
@@ -52,6 +53,11 @@ export default function RecordPage() {
       setAudioBlob(blob)
       toast.success('녹음이 완료되었습니다! 저장 버튼을 눌러 일기를 작성하세요.')
     }
+  }
+
+  const handleReRecord = () => {
+    setAudioBlob(null)
+    resetRecording()
   }
 
   const handleSave = async () => {
@@ -209,18 +215,32 @@ export default function RecordPage() {
             )}
 
             {audioBlob && !isRecording && (
-              <div className="flex flex-col items-center gap-2">
-                <Button
-                  size="lg"
-                  onClick={handleSave}
-                  disabled={isProcessing}
-                  className="rounded-full w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg transform transition-all hover:scale-105"
-                >
-                  <Send className="w-6 h-6" />
-                </Button>
-                <p className="text-xs text-neutral-500">
-                  {isProcessing ? '처리 중...' : '저장하기'}
-                </p>
+              <div className="flex items-center gap-4">
+                <div className="flex flex-col items-center gap-2">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    onClick={handleReRecord}
+                    className="rounded-full w-14 h-14"
+                  >
+                    <RotateCcw className="w-5 h-5" />
+                  </Button>
+                  <p className="text-xs text-neutral-500">재녹음</p>
+                </div>
+                
+                <div className="flex flex-col items-center gap-2">
+                  <Button
+                    size="lg"
+                    onClick={handleSave}
+                    disabled={isProcessing}
+                    className="rounded-full w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg transform transition-all hover:scale-105"
+                  >
+                    <Send className="w-6 h-6" />
+                  </Button>
+                  <p className="text-xs text-neutral-500">
+                    {isProcessing ? '처리 중...' : '저장하기'}
+                  </p>
+                </div>
               </div>
             )}
           </div>

@@ -10,6 +10,7 @@ interface UseRecorderReturn {
   stopRecording: () => Promise<Blob | null>
   pauseRecording: () => void
   resumeRecording: () => void
+  resetRecording: () => void
   audioLevel: number
 }
 
@@ -180,7 +181,7 @@ export function useRecorder(): UseRecorderReturn {
         stopTimer()
         setIsRecording(false)
         setIsPaused(false)
-        setRecordingTime(0)
+        // recordingTime은 유지하여 총 녹음 시간을 보여줌
         setAudioLevel(0)
         startTimeRef.current = null
         
@@ -229,6 +230,10 @@ export function useRecorder(): UseRecorderReturn {
     }
   }
 
+  const resetRecording = () => {
+    setRecordingTime(0)
+  }
+
   return {
     isRecording,
     isPaused,
@@ -237,6 +242,7 @@ export function useRecorder(): UseRecorderReturn {
     stopRecording,
     pauseRecording,
     resumeRecording,
+    resetRecording,
     audioLevel,
   }
 }

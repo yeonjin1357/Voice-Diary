@@ -32,14 +32,18 @@ export function BottomNavigation() {
   useEffect(() => {
     // 현재 사용자 정보 가져오기
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
       setUser(user)
     }
-    
+
     getUser()
 
     // 인증 상태 변경 감지
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null)
     })
 
@@ -48,12 +52,12 @@ export function BottomNavigation() {
 
   const handleLogout = async () => {
     setIsLoading(true)
-    
+
     try {
       const { error } = await supabase.auth.signOut()
-      
+
       if (error) throw error
-      
+
       toast.success('로그아웃되었습니다')
       router.push('/')
       router.refresh()
@@ -74,8 +78,8 @@ export function BottomNavigation() {
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 dark:bg-neutral-900 dark:border-neutral-800">
-      <div className="flex justify-around items-center h-16">
+    <nav className="fixed right-0 bottom-0 left-0 border-t border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="flex h-16 items-center justify-around">
         {navItems.map((item) => {
           const isActive = pathname === item.href
           const Icon = item.icon
@@ -85,35 +89,35 @@ export function BottomNavigation() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex flex-col items-center justify-center w-full h-full px-2 py-1 transition-colors',
+                'flex h-full w-full flex-col items-center justify-center px-2 py-1 transition-colors',
                 isActive
                   ? 'text-indigo-500 dark:text-indigo-400'
-                  : 'text-neutral-500 dark:text-neutral-400'
+                  : 'text-neutral-500 dark:text-neutral-400',
               )}
             >
-              <Icon className="w-5 h-5 mb-1" />
+              <Icon className="mb-1 h-5 w-5" />
               <span className="text-xs font-medium">{item.label}</span>
             </Link>
           )
         })}
-        
+
         {/* 사용자 메뉴 */}
         <button
           onClick={handleUserMenuClick}
           disabled={isLoading}
           className={cn(
-            'flex flex-col items-center justify-center w-full h-full px-2 py-1 transition-colors',
-            'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300'
+            'flex h-full w-full cursor-pointer flex-col items-center justify-center px-2 py-1 transition-colors',
+            'text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300',
           )}
         >
           {user ? (
             <>
-              <LogOut className="w-5 h-5 mb-1" />
+              <LogOut className="mb-1 h-5 w-5" />
               <span className="text-xs font-medium">로그아웃</span>
             </>
           ) : (
             <>
-              <LogIn className="w-5 h-5 mb-1" />
+              <LogIn className="mb-1 h-5 w-5" />
               <span className="text-xs font-medium">로그인</span>
             </>
           )}

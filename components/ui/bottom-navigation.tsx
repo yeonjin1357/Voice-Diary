@@ -1,13 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import { Home, Mic, BookOpen, BarChart3, LogIn, LogOut } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { Home, Mic, BookOpen, BarChart3, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { createClient } from '@/lib/supabase/client'
-import { useEffect, useState } from 'react'
-import type { User as SupabaseUser } from '@supabase/supabase-js'
-import { toast } from 'sonner'
 
 interface NavItem {
   href: string
@@ -20,62 +16,11 @@ const navItems: NavItem[] = [
   { href: '/record', icon: Mic, label: '녹음' },
   { href: '/diary', icon: BookOpen, label: '일기' },
   { href: '/insights', icon: BarChart3, label: '인사이트' },
+  { href: '/profile', icon: User, label: '내정보' },
 ]
 
 export function BottomNavigation() {
   const pathname = usePathname()
-  const router = useRouter()
-  const supabase = createClient()
-  const [user, setUser] = useState<SupabaseUser | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-
-  useEffect(() => {
-    // 현재 사용자 정보 가져오기
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      setUser(user)
-    }
-
-    getUser()
-
-    // 인증 상태 변경 감지
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [supabase.auth])
-
-  const handleLogout = async () => {
-    setIsLoading(true)
-
-    try {
-      const { error } = await supabase.auth.signOut()
-
-      if (error) throw error
-
-      toast.success('로그아웃되었습니다')
-      router.push('/')
-      router.refresh()
-    } catch (error) {
-      toast.error('로그아웃 중 오류가 발생했습니다')
-      console.error('Logout error:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleUserMenuClick = () => {
-    if (user) {
-      handleLogout()
-    } else {
-      router.push('/auth/login')
-    }
-  }
 
   return (
     <nav className="fixed right-0 bottom-0 left-0 border-t border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
@@ -100,28 +45,6 @@ export function BottomNavigation() {
             </Link>
           )
         })}
-
-        {/* 사용자 메뉴 */}
-        <button
-          onClick={handleUserMenuClick}
-          disabled={isLoading}
-          className={cn(
-            'flex h-full w-full cursor-pointer flex-col items-center justify-center px-2 py-1 transition-colors',
-            'text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300',
-          )}
-        >
-          {user ? (
-            <>
-              <LogOut className="mb-1 h-5 w-5" />
-              <span className="text-xs font-medium">로그아웃</span>
-            </>
-          ) : (
-            <>
-              <LogIn className="mb-1 h-5 w-5" />
-              <span className="text-xs font-medium">로그인</span>
-            </>
-          )}
-        </button>
       </div>
     </nav>
   )

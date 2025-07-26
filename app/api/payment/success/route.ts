@@ -48,7 +48,8 @@ export async function GET(request: NextRequest) {
     const paymentData = await confirmResponse.json()
 
     // 주문 ID에서 결제 정보 파싱
-    const [, userId, , billingCycle] = orderId.split('_')
+    const parts = orderId.split('_')
+    const billingCycle = parts[parts.length - 1]
     const isYearly = billingCycle === 'yearly'
 
     // 구독 정보 업데이트

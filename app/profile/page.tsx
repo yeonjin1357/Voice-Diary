@@ -48,43 +48,55 @@ export default function ProfilePage() {
   const router = useRouter()
   const supabase = createClient()
   const { userProfile, getUsageInfo } = useSubscription()
-  const [user, setUser] = useState<any>(null)
-  const [usage, setUsage] = useState<any>(null)
+  const [user, setUser] = useState<{
+    id: string
+    email?: string
+    user_metadata?: {
+      full_name?: string
+      avatar_url?: string
+      [key: string]: unknown
+    }
+  } | null>(null)
+  const [usage, setUsage] = useState<{
+    diary_count: number
+    total_recording_minutes: number
+  } | null>(null)
   const [diaryCount, setDiaryCount] = useState(0)
 
   useEffect(() => {
+    const fetchUserData = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) {
+        router.push('/auth/login')
+        return
+      }
+      setUser(user)
+
+      // 전체 일기 개수 가져오기
+      const { count } = await supabase
+        .from('diary_entries')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+
+      setDiaryCount(count || 0)
+    }
+    
     fetchUserData()
-  }, [])
+  }, [router, supabase])
 
   useEffect(() => {
+    const fetchUsageData = async () => {
+      const usageInfo = await getUsageInfo()
+      setUsage(usageInfo)
+    }
+    
     if (userProfile) {
       fetchUsageData()
     }
-  }, [userProfile])
+  }, [userProfile, getUsageInfo])
 
-  const fetchUserData = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    if (!user) {
-      router.push('/auth/login')
-      return
-    }
-    setUser(user)
-
-    // 전체 일기 개수 가져오기
-    const { count } = await supabase
-      .from('diary_entries')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-
-    setDiaryCount(count || 0)
-  }
-
-  const fetchUsageData = async () => {
-    const usageInfo = await getUsageInfo()
-    setUsage(usageInfo)
-  }
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -212,10 +224,9 @@ export default function ProfilePage() {
             <div className="relative">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-purple-100 to-pink-100">
                 {userProfile?.avatarUrl ? (
-                  <img
-                    src={userProfile.avatarUrl}
-                    alt="프로필"
-                    className="h-full w-full rounded-full object-cover"
+                  <div
+                    style={{ backgroundImage: `url(${userProfile.avatarUrl})` }}
+                    className="h-full w-full rounded-full bg-cover bg-center"
                   />
                 ) : (
                   <User className="h-8 w-8 text-purple-600" />

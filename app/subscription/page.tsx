@@ -33,16 +33,16 @@ export default function SubscriptionPage() {
     'monthly',
   )
 
-  const fetchUsage = async () => {
-    const usageInfo = await getUsageInfo()
-    setUsage(usageInfo)
-  }
-
   useEffect(() => {
+    const fetchUsage = async () => {
+      const usageInfo = await getUsageInfo()
+      setUsage(usageInfo)
+    }
+    
     if (userProfile) {
       fetchUsage()
     }
-  }, [userProfile])
+  }, [userProfile, getUsageInfo])
 
   const handleSubscribe = async () => {
     router.push(`/payment?plan=${billingCycle}`)

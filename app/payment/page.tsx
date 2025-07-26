@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { MobileLayout } from '@/components/layout/mobile-layout'
 import { TossPaymentsCheckout } from '@/components/payment/tosspayments-checkout'
@@ -9,12 +9,16 @@ import { ArrowLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 
-export default function PaymentPage() {
+function PaymentContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const billingCycle = (searchParams.get('plan') || 'monthly') as 'monthly' | 'yearly'
   
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<{
+    id: string
+    email: string
+    name?: string
+  } | null>(null)
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
 
@@ -42,7 +46,7 @@ export default function PaymentPage() {
       
       setUser({
         id: user.id,
-        email: user.email,
+        email: user.email || '',
         name: profile?.name || user.user_metadata?.name,
       })
       setLoading(false)
@@ -65,7 +69,7 @@ export default function PaymentPage() {
     </div>
   )
 
-  if (loading) {
+  if (loading || !user) {
     return (
       <MobileLayout header={header}>
         <div className="flex items-center justify-center h-screen">
@@ -86,5 +90,39 @@ export default function PaymentPage() {
         />
       </div>
     </MobileLayout>
+  )
+}
+
+function LoadingFallback() {
+  const router = useRouter()
+  
+  const header = (
+    <div className="flex items-center px-4 py-3">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => router.back()}
+        className="mr-2"
+      >
+        <ArrowLeft className="h-5 w-5" />
+      </Button>
+      <h1 className="text-lg font-semibold">결제하기</h1>
+    </div>
+  )
+  
+  return (
+    <MobileLayout header={header}>
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-gray-500">로딩 중...</p>
+      </div>
+    </MobileLayout>
+  )
+}
+
+export default function PaymentPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <PaymentContent />
+    </Suspense>
   )
 }

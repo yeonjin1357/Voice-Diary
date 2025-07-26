@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { MobileLayout } from '@/components/layout/mobile-layout'
 import { useRecorder } from '@/hooks/useRecorder'
 import { Card } from '@/components/ui/card'
@@ -77,7 +77,7 @@ export default function RecordPage() {
     }
   }
 
-  const handleStopRecording = async () => {
+  const handleStopRecording = useCallback(async () => {
     // 녹음 시간 제한 체크
     if (userProfile?.subscriptionTier === 'free') {
       const maxMinutes = SUBSCRIPTION_LIMITS.free.maxRecordingMinutes
@@ -93,7 +93,7 @@ export default function RecordPage() {
       setAudioBlob(blob)
       toast.success('녹음이 완료되었습니다! 저장 버튼을 눌러 일기를 작성하세요.')
     }
-  }
+  }, [recordingTime, stopRecording, userProfile?.subscriptionTier])
 
   const handleReRecord = () => {
     setAudioBlob(null)

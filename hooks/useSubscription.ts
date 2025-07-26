@@ -56,8 +56,14 @@ export function useSubscription() {
           
           if (!insertError) {
             setUserProfile({
-              ...newProfile,
+              id: newProfile.id,
+              email: newProfile.email,
+              name: newProfile.name,
+              avatarUrl: newProfile.avatar_url,
+              subscriptionTier: newProfile.subscription_tier as 'free' | 'premium',
+              subscriptionStatus: 'active' as const,
               subscriptionEndDate: undefined,
+              stripeCustomerId: newProfile.stripe_customer_id || undefined,
               createdAt: new Date(newProfile.created_at),
               updatedAt: new Date(newProfile.updated_at),
             })

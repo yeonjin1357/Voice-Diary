@@ -1,5 +1,7 @@
 'use client'
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useEffect, useState } from 'react'
 import { loadPaymentWidget } from '@tosspayments/payment-widget-sdk'
 import { SUBSCRIPTION_PRICES, formatPrice } from '@/lib/constants/subscription'
@@ -7,7 +9,6 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Crown, Check } from 'lucide-react'
 import { toast } from 'sonner'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { nanoid } from 'nanoid'
 
@@ -24,7 +25,6 @@ export function TossPaymentsCheckout({
   userId,
   userName = '구매자'
 }: TossPaymentsCheckoutProps) {
-  const router = useRouter()
   const [paymentWidget, setPaymentWidget] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [customerKey] = useState(() => `USER_${userId}`)

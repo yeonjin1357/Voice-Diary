@@ -50,8 +50,6 @@ export function TossPaymentsCheckout({
         console.log('Customer Key:', customerKey)
         console.log('Is Test Mode:', clientKey.startsWith('test_'))
 
-        // 테스트 환경 여부 확인
-        const isTest = clientKey.startsWith('test_')
         
         const widget = await loadPaymentWidget(clientKey, customerKey)
         setPaymentWidget(widget)
@@ -119,7 +117,7 @@ export function TossPaymentsCheckout({
     }
 
     renderWidgets()
-  }, [paymentWidget, price, isLoading])
+  }, [paymentWidget, price])
 
   const handlePayment = async () => {
     if (!paymentWidget) {

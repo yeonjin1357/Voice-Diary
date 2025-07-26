@@ -44,9 +44,6 @@ export default function SubscriptionPage() {
     }
   }, [userProfile, getUsageInfo])
 
-  const handleSubscribe = async () => {
-    router.push(`/payment?plan=${billingCycle}`)
-  }
 
   const handleCancelSubscription = async () => {
     if (!confirm('정말로 구독을 취소하시겠습니까?')) return

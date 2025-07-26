@@ -13,9 +13,6 @@ import { toast } from 'sonner'
 function PaymentContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const billingCycle = (searchParams.get('plan') || 'monthly') as
-    | 'monthly'
-    | 'yearly'
 
   const [user, setUser] = useState<{
     id: string

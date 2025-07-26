@@ -27,6 +27,7 @@ export function TossPaymentsCheckout({
 }: TossPaymentsCheckoutProps) {
   const [paymentWidget, setPaymentWidget] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isPaymentReady, setIsPaymentReady] = useState(false)
   const [customerKey] = useState(() => `USER_${userId}`)
   const supabase = createClient()
 
@@ -47,10 +48,21 @@ export function TossPaymentsCheckout({
         setPaymentWidget(widget)
 
         // 결제 UI 렌더링
-        widget.renderPaymentMethods('#payment-widget', price)
-        widget.renderAgreement('#agreement-widget')
+        await widget.renderPaymentMethods('#payment-widget', {
+          value: price,
+          currency: 'KRW',
+          country: 'KR',
+        })
+        
+        await widget.renderAgreement('#agreement-widget', {
+          variantKey: 'DEFAULT',
+        })
 
-        setIsLoading(false)
+        // 렌더링 완료 후 약간의 지연 시간을 줍니다
+        setTimeout(() => {
+          setIsPaymentReady(true)
+          setIsLoading(false)
+        }, 500)
       } catch (error) {
         console.error('결제 위젯 로드 실패:', error)
         toast.error('결제 시스템 초기화에 실패했습니다')
@@ -64,6 +76,11 @@ export function TossPaymentsCheckout({
   const handlePayment = async () => {
     if (!paymentWidget) {
       toast.error('결제 위젯이 로드되지 않았습니다')
+      return
+    }
+
+    if (!isPaymentReady) {
+      toast.error('결제 시스템이 준비 중입니다. 잠시 후 다시 시도해주세요.')
       return
     }
 
@@ -174,11 +191,11 @@ export function TossPaymentsCheckout({
       {/* 결제 버튼 */}
       <Button
         onClick={handlePayment}
-        disabled={isLoading}
-        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700"
+        disabled={isLoading || !isPaymentReady}
+        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 disabled:opacity-50"
         size="lg"
       >
-        {isLoading ? '준비 중...' : `₩${formatPrice(price)} 결제하기`}
+        {isLoading ? '준비 중...' : !isPaymentReady ? '결제 시스템 준비 중...' : `₩${formatPrice(price)} 결제하기`}
       </Button>
 
       {/* 안내 문구 */}

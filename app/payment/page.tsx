@@ -12,8 +12,10 @@ import { toast } from 'sonner'
 function PaymentContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const billingCycle = (searchParams.get('plan') || 'monthly') as 'monthly' | 'yearly'
-  
+  const billingCycle = (searchParams.get('plan') || 'monthly') as
+    | 'monthly'
+    | 'yearly'
+
   const [user, setUser] = useState<{
     id: string
     email: string
@@ -24,26 +26,28 @@ function PaymentContent() {
 
   useEffect(() => {
     const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
       if (!user) {
         toast.error('로그인이 필요합니다')
         router.push('/auth/login')
         return
       }
-      
+
       // 사용자 프로필 가져오기
       const { data: profile } = await supabase
         .from('user_profiles')
         .select('*')
         .eq('id', user.id)
         .single()
-        
+
       if (profile?.subscription_tier === 'premium') {
         toast.info('이미 프리미엄 회원입니다')
         router.push('/subscription')
         return
       }
-      
+
       setUser({
         id: user.id,
         email: user.email || '',
@@ -51,7 +55,7 @@ function PaymentContent() {
       })
       setLoading(false)
     }
-    
+
     checkUser()
   }, [supabase, router])
 
@@ -72,7 +76,7 @@ function PaymentContent() {
   if (loading || !user) {
     return (
       <MobileLayout header={header}>
-        <div className="flex items-center justify-center h-screen">
+        <div className="flex h-screen items-center justify-center">
           <p className="text-gray-500">로딩 중...</p>
         </div>
       </MobileLayout>
@@ -95,7 +99,7 @@ function PaymentContent() {
 
 function LoadingFallback() {
   const router = useRouter()
-  
+
   const header = (
     <div className="flex items-center px-4 py-3">
       <Button
@@ -109,10 +113,10 @@ function LoadingFallback() {
       <h1 className="text-lg font-semibold">결제하기</h1>
     </div>
   )
-  
+
   return (
     <MobileLayout header={header}>
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex h-screen items-center justify-center">
         <p className="text-gray-500">로딩 중...</p>
       </div>
     </MobileLayout>

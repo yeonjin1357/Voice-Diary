@@ -19,11 +19,11 @@ interface TossPaymentsCheckoutProps {
   userName?: string
 }
 
-export function TossPaymentsCheckout({ 
-  billingCycle, 
-  userEmail, 
+export function TossPaymentsCheckout({
+  billingCycle,
+  userEmail,
   userId,
-  userName = '구매자'
+  userName = '구매자',
 }: TossPaymentsCheckoutProps) {
   const [paymentWidget, setPaymentWidget] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -47,8 +47,8 @@ export function TossPaymentsCheckout({
         setPaymentWidget(widget)
 
         // 결제 UI 렌더링
-        await widget.renderPaymentMethods('#payment-widget', price)
-        await widget.renderAgreement('#agreement-widget')
+        widget.renderPaymentMethods('#payment-widget', price)
+        widget.renderAgreement('#agreement-widget')
 
         setIsLoading(false)
       } catch (error) {
@@ -81,7 +81,7 @@ export function TossPaymentsCheckout({
           metadata: {
             billing_cycle: billingCycle,
             order_id: orderId,
-          }
+          },
         })
 
       if (orderError) throw orderError
@@ -105,8 +105,8 @@ export function TossPaymentsCheckout({
     return (
       <Card className="p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-40 bg-gray-200 rounded"></div>
-          <div className="h-10 bg-gray-200 rounded"></div>
+          <div className="h-40 rounded bg-gray-200"></div>
+          <div className="h-10 rounded bg-gray-200"></div>
         </div>
       </Card>
     )
@@ -116,9 +116,9 @@ export function TossPaymentsCheckout({
     <div className="space-y-6">
       {/* 상품 정보 */}
       <Card className="p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-            <Crown className="w-6 h-6 text-white" />
+        <div className="mb-4 flex items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500">
+            <Crown className="h-6 w-6 text-white" />
           </div>
           <div>
             <h3 className="font-semibold text-gray-900">프리미엄 구독</h3>
@@ -127,35 +127,35 @@ export function TossPaymentsCheckout({
             </p>
           </div>
         </div>
-        
-        <div className="space-y-2 mb-6">
+
+        <div className="mb-6 space-y-2">
           <div className="flex items-center gap-2 text-sm text-gray-700">
-            <Check className="w-4 h-4 text-green-500" />
+            <Check className="h-4 w-4 text-green-500" />
             <span>녹음 시간 10분으로 확대</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-700">
-            <Check className="w-4 h-4 text-green-500" />
+            <Check className="h-4 w-4 text-green-500" />
             <span>무제한 일기 작성</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-700">
-            <Check className="w-4 h-4 text-green-500" />
+            <Check className="h-4 w-4 text-green-500" />
             <span>일기 PDF 내보내기</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-700">
-            <Check className="w-4 h-4 text-green-500" />
+            <Check className="h-4 w-4 text-green-500" />
             <span>고급 감정 인사이트</span>
           </div>
         </div>
 
         <div className="border-t pt-4">
-          <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between">
             <span className="text-gray-600">결제 금액</span>
             <span className="text-2xl font-bold text-gray-900">
               ₩{formatPrice(price)}
             </span>
           </div>
           {billingCycle === 'yearly' && (
-            <p className="text-right text-sm text-gray-500 mt-1">
+            <p className="mt-1 text-right text-sm text-gray-500">
               월 ₩{formatPrice(Math.round(price / 12))}에 해당
             </p>
           )}
@@ -164,7 +164,7 @@ export function TossPaymentsCheckout({
 
       {/* 결제 수단 선택 */}
       <Card className="p-6">
-        <h3 className="font-semibold text-gray-900 mb-4">결제 수단 선택</h3>
+        <h3 className="mb-4 font-semibold text-gray-900">결제 수단 선택</h3>
         <div id="payment-widget" />
       </Card>
 
@@ -175,14 +175,14 @@ export function TossPaymentsCheckout({
       <Button
         onClick={handlePayment}
         disabled={isLoading}
-        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700"
         size="lg"
       >
         {isLoading ? '준비 중...' : `₩${formatPrice(price)} 결제하기`}
       </Button>
 
       {/* 안내 문구 */}
-      <div className="text-center text-xs text-gray-500 space-y-1">
+      <div className="space-y-1 text-center text-xs text-gray-500">
         <p>• 언제든지 구독을 취소할 수 있습니다</p>
         <p>• 결제는 토스페이먼츠를 통해 안전하게 처리됩니다</p>
       </div>

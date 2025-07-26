@@ -1,13 +1,12 @@
 'use client'
 
 import { useEffect, Suspense } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { MobileLayout } from '@/components/layout/mobile-layout'
 import { Card } from '@/components/ui/card'
 
 function PaymentCompleteContent() {
   const router = useRouter()
-  const searchParams = useSearchParams()
 
   // 결제 서비스 준비 중이므로 바로 홈으로 리다이렉트
   useEffect(() => {

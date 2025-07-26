@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, Suspense } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { MobileLayout } from '@/components/layout/mobile-layout'
 // import { TossPaymentsCheckout } from '@/components/payment/tosspayments-checkout'
 // import { SimplePayment } from '@/components/payment/simple-payment'
@@ -12,7 +12,6 @@ import { toast } from 'sonner'
 
 function PaymentContent() {
   const router = useRouter()
-  const searchParams = useSearchParams()
 
   const [user, setUser] = useState<{
     id: string

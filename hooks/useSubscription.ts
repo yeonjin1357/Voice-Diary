@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { UserProfile, SubscriptionPlan } from '@/types'
 import { SUBSCRIPTION_LIMITS, SUBSCRIPTION_TIERS } from '@/lib/constants/subscription'
@@ -126,26 +126,30 @@ export function useSubscription() {
     return recordingSeconds <= limit * 60
   }
 
-  const getUsageInfo = async () => {
+  const getUsageInfo = useCallback(async () => {
     if (!userProfile) return null
 
     const now = new Date()
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+    // UTC 기준으로 월의 첫날을 생성
+    const year = now.getFullYear()
+    const month = now.getMonth()
+    const monthStart = new Date(Date.UTC(year, month, 1))
+    const monthKey = monthStart.toISOString().split('T')[0]
 
     const { data, error } = await supabase
       .from('usage_tracking')
       .select('*')
       .eq('user_id', userProfile.id)
-      .eq('month', monthStart.toISOString().split('T')[0])
-      .single()
+      .eq('month', monthKey)
+      .maybeSingle() // single() 대신 maybeSingle() 사용
 
-    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+    if (error) {
       console.error('사용량 조회 실패:', error)
       return null
     }
 
     return data || { diary_count: 0, total_recording_minutes: 0 }
-  }
+  }, [userProfile, supabase])
 
   const canCreateDiary = async (): Promise<boolean> => {
     if (!userProfile) return false
@@ -163,7 +167,10 @@ export function useSubscription() {
     if (!userProfile) return
 
     const now = new Date()
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+    // UTC 기준으로 월의 첫날을 생성
+    const year = now.getFullYear()
+    const month = now.getMonth()
+    const monthStart = new Date(Date.UTC(year, month, 1))
     const monthKey = monthStart.toISOString().split('T')[0]
 
     // 현재 사용량 가져오기
@@ -172,7 +179,7 @@ export function useSubscription() {
       .select('*')
       .eq('user_id', userProfile.id)
       .eq('month', monthKey)
-      .single()
+      .maybeSingle()
 
     if (existing) {
       // 업데이트

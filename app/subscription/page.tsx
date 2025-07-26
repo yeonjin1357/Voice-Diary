@@ -230,13 +230,23 @@ export default function SubscriptionPage() {
             </div>
 
             {userProfile?.subscriptionTier === 'free' ? (
-              <Button
-                onClick={handleSubscribe}
-                className="w-full bg-white font-semibold text-purple-600 hover:bg-gray-100"
-                size="lg"
-              >
-                프리미엄 시작하기
-              </Button>
+              <div className="space-y-3">
+                <div className="rounded-lg bg-white/20 p-3 text-center">
+                  <p className="text-sm text-white/90">
+                    현재 결제 서비스를 준비 중입니다
+                  </p>
+                  <p className="text-xs text-white/70 mt-1">
+                    곧 프리미엄 서비스를 이용하실 수 있습니다
+                  </p>
+                </div>
+                <Button
+                  disabled
+                  className="w-full bg-white/50 font-semibold text-purple-600/50 cursor-not-allowed"
+                  size="lg"
+                >
+                  프리미엄 시작하기 (준비 중)
+                </Button>
+              </div>
             ) : (
               <div className="text-center">
                 <p className="text-sm text-purple-100">

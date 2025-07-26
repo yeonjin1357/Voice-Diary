@@ -3,7 +3,8 @@
 import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { MobileLayout } from '@/components/layout/mobile-layout'
-import { TossPaymentsCheckout } from '@/components/payment/tosspayments-checkout'
+// import { TossPaymentsCheckout } from '@/components/payment/tosspayments-checkout'
+// import { SimplePayment } from '@/components/payment/simple-payment'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -86,12 +87,24 @@ function PaymentContent() {
   return (
     <MobileLayout header={header}>
       <div className="px-4 py-6">
-        <TossPaymentsCheckout
-          billingCycle={billingCycle}
-          userEmail={user.email}
-          userId={user.id}
-          userName={user.name}
-        />
+        <div className="rounded-lg bg-yellow-50 border border-yellow-200 p-4 mb-6">
+          <h2 className="text-lg font-semibold text-yellow-900 mb-2">
+            결제 서비스 준비 중
+          </h2>
+          <p className="text-yellow-800">
+            현재 결제 서비스를 준비하고 있습니다. 
+            빠른 시일 내에 프리미엄 서비스를 제공할 예정이니 조금만 기다려주세요.
+          </p>
+        </div>
+        <div className="text-center">
+          <Button
+            onClick={() => router.back()}
+            variant="outline"
+            className="mt-4"
+          >
+            돌아가기
+          </Button>
+        </div>
       </div>
     </MobileLayout>
   )

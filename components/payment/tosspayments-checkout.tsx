@@ -37,6 +37,8 @@ export function TossPaymentsCheckout({
   const orderId = `ORDER_${nanoid()}`
 
   useEffect(() => {
+    if (!isLoading) return // 로딩이 완료된 후에만 실행
+    
     const loadWidget = async () => {
       try {
         const clientKey = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY
@@ -44,25 +46,16 @@ export function TossPaymentsCheckout({
           throw new Error('토스페이먼츠 클라이언트 키가 설정되지 않았습니다')
         }
 
+        console.log('TossPayments Client Key:', clientKey)
+        console.log('Customer Key:', customerKey)
+        console.log('Is Test Mode:', clientKey.startsWith('test_'))
+
+        // 테스트 환경 여부 확인
+        const isTest = clientKey.startsWith('test_')
+        
         const widget = await loadPaymentWidget(clientKey, customerKey)
         setPaymentWidget(widget)
-
-        // 결제 UI 렌더링
-        await widget.renderPaymentMethods('#payment-widget', {
-          value: price,
-          currency: 'KRW',
-          country: 'KR',
-        })
-        
-        await widget.renderAgreement('#agreement-widget', {
-          variantKey: 'DEFAULT',
-        })
-
-        // 렌더링 완료 후 약간의 지연 시간을 줍니다
-        setTimeout(() => {
-          setIsPaymentReady(true)
-          setIsLoading(false)
-        }, 500)
+        setIsLoading(false) // 위젯 로드 완료
       } catch (error) {
         console.error('결제 위젯 로드 실패:', error)
         toast.error('결제 시스템 초기화에 실패했습니다')
@@ -71,7 +64,62 @@ export function TossPaymentsCheckout({
     }
 
     loadWidget()
-  }, [customerKey, price])
+  }, [customerKey])
+
+  // 위젯 렌더링은 별도의 useEffect에서 처리
+  useEffect(() => {
+    if (!paymentWidget || isLoading) return
+
+    const renderWidgets = async () => {
+      try {
+        // DOM이 준비될 때까지 더 오래 대기
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
+        // payment-widget 요소가 있는지 확인
+        const paymentElement = document.querySelector('#payment-widget')
+        if (!paymentElement) {
+          console.error('Payment widget element not found')
+          return
+        }
+        
+        // 결제 UI 렌더링
+        console.log('Rendering payment methods...')
+        try {
+          await paymentWidget.renderPaymentMethods('#payment-widget', {
+            value: price,
+            currency: 'KRW',
+            country: 'KR',
+          })
+          console.log('Payment methods rendered successfully')
+        } catch (renderError) {
+          console.error('Payment methods render error:', renderError)
+          throw renderError
+        }
+        
+        // agreement-widget 요소가 있는지 확인
+        const agreementElement = document.querySelector('#agreement-widget')
+        if (!agreementElement) {
+          console.error('Agreement widget element not found')
+          return
+        }
+        
+        await paymentWidget.renderAgreement('#agreement-widget')
+
+        // 렌더링 완료 후 추가 대기
+        console.log('Waiting for payment widget to be fully ready...')
+        await new Promise(resolve => setTimeout(resolve, 2000))
+        
+        // 렌더링 완료
+        setIsPaymentReady(true)
+        console.log('Payment widget is ready!')
+      } catch (error) {
+        console.error('위젯 렌더링 실패:', error)
+        toast.error('결제 UI 렌더링에 실패했습니다')
+      }
+    }
+
+    renderWidgets()
+  }, [paymentWidget, price, isLoading])
 
   const handlePayment = async () => {
     if (!paymentWidget) {
@@ -104,6 +152,14 @@ export function TossPaymentsCheckout({
       if (orderError) throw orderError
 
       // 토스페이먼츠 결제 요청
+      console.log('Requesting payment with:', {
+        orderId,
+        orderName,
+        customerName: userName,
+        customerEmail: userEmail,
+        amount: price,
+      })
+      
       await paymentWidget.requestPayment({
         orderId,
         orderName,
@@ -112,9 +168,15 @@ export function TossPaymentsCheckout({
         successUrl: `${window.location.origin}/api/payment/success`,
         failUrl: `${window.location.origin}/api/payment/fail`,
       })
-    } catch (error) {
+    } catch (error: any) {
       console.error('결제 요청 실패:', error)
-      toast.error('결제 처리 중 오류가 발생했습니다')
+      
+      // 에러 메시지를 더 구체적으로 표시
+      if (error.message?.includes('렌더링')) {
+        toast.error('결제 UI가 아직 준비되지 않았습니다. 잠시 후 다시 시도해주세요.')
+      } else {
+        toast.error(error.message || '결제 처리 중 오류가 발생했습니다')
+      }
     }
   }
 
@@ -182,11 +244,11 @@ export function TossPaymentsCheckout({
       {/* 결제 수단 선택 */}
       <Card className="p-6">
         <h3 className="mb-4 font-semibold text-gray-900">결제 수단 선택</h3>
-        <div id="payment-widget" />
+        <div id="payment-widget" style={{ minHeight: '200px' }} />
       </Card>
 
       {/* 이용약관 */}
-      <div id="agreement-widget" />
+      <div id="agreement-widget" style={{ minHeight: '100px' }} />
 
       {/* 결제 버튼 */}
       <Button

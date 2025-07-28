@@ -12,7 +12,15 @@ import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { useSubscription } from '@/hooks/useSubscription'
 import { SUBSCRIPTION_LIMITS } from '@/lib/constants/subscription'
-import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 export default function RecordPage() {
   const router = useRouter()
@@ -27,23 +35,26 @@ export default function RecordPage() {
     resetRecording,
     audioLevel,
   } = useRecorder()
-  
+
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false)
   const [upgradeMessage, setUpgradeMessage] = useState('')
   const supabase = createClient()
-  const { userProfile, canCreateDiary, updateUsage, getUsageInfo } = useSubscription()
+  const { userProfile, canCreateDiary, updateUsage, getUsageInfo } =
+    useSubscription()
 
   useEffect(() => {
     const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
       if (!user) {
         toast.error('로그인이 필요합니다')
         router.push('/auth/login')
       }
     }
-    
+
     checkUser()
   }, [supabase.auth, router])
 
@@ -60,11 +71,13 @@ export default function RecordPage() {
       if (!canCreate && userProfile?.subscriptionTier === 'free') {
         await getUsageInfo()
         const limit = SUBSCRIPTION_LIMITS.free.maxDiariesPerMonth
-        setUpgradeMessage(`이번 달 무료 일기 작성 한도(${limit}개)에 도달했습니다. 프리미엄으로 업그레이드하여 무제한으로 일기를 작성하세요!`)
+        setUpgradeMessage(
+          `이번 달 무료 일기 작성 한도(${limit}개)에 도달했습니다. 프리미엄으로 업그레이드하여 무제한으로 일기를 작성하세요!`,
+        )
         setShowUpgradeDialog(true)
         return
       }
-      
+
       await startRecording()
       setAudioBlob(null)
     } catch (error) {
@@ -82,16 +95,20 @@ export default function RecordPage() {
     if (userProfile?.subscriptionTier === 'free') {
       const maxMinutes = SUBSCRIPTION_LIMITS.free.maxRecordingMinutes
       if (recordingTime > maxMinutes * 60) {
-        setUpgradeMessage(`무료 회원은 최대 ${maxMinutes}분까지 녹음할 수 있습니다. 프리미엄으로 업그레이드하여 최대 10분까지 녹음하세요!`)
+        setUpgradeMessage(
+          `무료 회원은 최대 ${maxMinutes}분까지 녹음할 수 있습니다. 프리미엄으로 업그레이드하여 최대 10분까지 녹음하세요!`,
+        )
         setShowUpgradeDialog(true)
         // 녹음 강제 중지
       }
     }
-    
+
     const blob = await stopRecording()
     if (blob) {
       setAudioBlob(blob)
-      toast.success('녹음이 완료되었습니다! 저장 버튼을 눌러 일기를 작성하세요.')
+      toast.success(
+        '녹음이 완료되었습니다! 저장 버튼을 눌러 일기를 작성하세요.',
+      )
     }
   }, [recordingTime, stopRecording, userProfile?.subscriptionTier])
 
@@ -102,24 +119,24 @@ export default function RecordPage() {
 
   const handleSave = async () => {
     if (!audioBlob) return
-    
+
     setIsProcessing(true)
     try {
       // 1. Whisper API로 음성을 텍스트로 변환
       const formData = new FormData()
       formData.append('audio', audioBlob, 'recording.webm')
-      
+
       const transcriptResponse = await fetch('/api/whisper', {
         method: 'POST',
         body: formData,
       })
-      
+
       if (!transcriptResponse.ok) {
         throw new Error('음성을 텍스트로 변환하는데 실패했습니다')
       }
-      
+
       const { transcript } = await transcriptResponse.json()
-      
+
       // 2. GPT-4로 감정 분석
       const analysisResponse = await fetch('/api/analyze', {
         method: 'POST',
@@ -128,16 +145,16 @@ export default function RecordPage() {
         },
         body: JSON.stringify({ transcript }),
       })
-      
+
       if (!analysisResponse.ok) {
         throw new Error('감정 분석에 실패했습니다')
       }
-      
+
       const { analysis } = await analysisResponse.json()
-      
+
       // 3. Supabase에 저장
       const today = new Date().toISOString().split('T')[0]
-      
+
       const diaryResponse = await fetch('/api/diary', {
         method: 'POST',
         headers: {
@@ -152,18 +169,18 @@ export default function RecordPage() {
           keywords: analysis.keywords,
         }),
       })
-      
+
       if (!diaryResponse.ok) {
         const errorData = await diaryResponse.json()
         console.error('일기 저장 실패:', errorData)
         throw new Error(errorData.error || '일기 저장에 실패했습니다')
       }
-      
+
       const { diaryId } = await diaryResponse.json()
-      
+
       // 4. 사용량 업데이트
       await updateUsage(Math.ceil(recordingTime / 60))
-      
+
       // 5. 일기 상세 페이지로 이동
       router.push(`/diary/${diaryId}`)
     } catch (error) {
@@ -190,7 +207,9 @@ export default function RecordPage() {
       const maxSeconds = SUBSCRIPTION_LIMITS.free.maxRecordingMinutes * 60
       if (recordingTime >= maxSeconds) {
         handleStopRecording()
-        setUpgradeMessage(`무료 회원은 최대 ${SUBSCRIPTION_LIMITS.free.maxRecordingMinutes}분까지 녹음할 수 있습니다. 프리미엄으로 업그레이드하여 최대 10분까지 녹음하세요!`)
+        setUpgradeMessage(
+          `무료 회원은 최대 ${SUBSCRIPTION_LIMITS.free.maxRecordingMinutes}분까지 녹음할 수 있습니다. 프리미엄으로 업그레이드하여 최대 10분까지 녹음하세요!`,
+        )
         setShowUpgradeDialog(true)
       }
     }
@@ -198,49 +217,59 @@ export default function RecordPage() {
 
   return (
     <MobileLayout header={header}>
-      <div className="flex flex-col h-[calc(100vh-8rem)] px-4 py-6">
+      <div className="flex h-[calc(100vh-8rem)] flex-col px-4 py-6">
         {/* 녹음 상태 표시 */}
-        <div className="flex-1 flex flex-col items-center justify-center space-y-8">
+        <div className="flex flex-1 flex-col items-center justify-center space-y-8">
           {/* 오디오 레벨 시각화 */}
           <div className="relative">
-            <div className={cn(
-              "w-32 h-32 rounded-full flex items-center justify-center transition-all",
-              isRecording && !isPaused 
-                ? "bg-red-100 dark:bg-red-900/20" 
-                : "bg-neutral-100 dark:bg-neutral-800"
-            )}>
+            <div
+              className={cn(
+                'flex h-32 w-32 items-center justify-center rounded-full transition-all',
+                isRecording && !isPaused
+                  ? 'bg-red-100 dark:bg-red-900/20'
+                  : 'bg-neutral-100 dark:bg-neutral-800',
+              )}
+            >
               {isRecording ? (
-                <div 
-                  className="absolute inset-0 rounded-full bg-red-500/20 animate-pulse"
+                <div
+                  className="absolute inset-0 animate-pulse rounded-full bg-red-500/20"
                   style={{
                     transform: `scale(${1 + audioLevel * 0.5})`,
-                    transition: 'transform 0.1s ease-out'
+                    transition: 'transform 0.1s ease-out',
                   }}
                 />
               ) : null}
-              <Mic className={cn(
-                "w-12 h-12 relative z-10",
-                isRecording ? "text-red-500" : "text-neutral-400"
-              )} />
+              <Mic
+                className={cn(
+                  'relative z-10 h-12 w-12',
+                  isRecording ? 'text-red-500' : 'text-neutral-400',
+                )}
+              />
             </div>
           </div>
 
           {/* 녹음 시간 */}
           <div className="text-center">
-            <p className="text-3xl font-mono font-medium">
+            <p className="font-mono text-3xl font-medium">
               {formatTime(recordingTime)}
             </p>
-            <p className="text-sm text-neutral-500 mt-1">
-              {isRecording 
-                ? (isPaused ? "일시정지됨" : "녹음 중...")
-                : (audioBlob ? "녹음 완료" : "녹음 시작을 눌러주세요")
-              }
+            <p className="mt-1 text-sm text-neutral-500">
+              {isRecording
+                ? isPaused
+                  ? '일시정지됨'
+                  : '녹음 중...'
+                : audioBlob
+                  ? '녹음 완료'
+                  : '녹음 시작을 눌러주세요'}
             </p>
             {/* 녹음 시간 제한 표시 */}
             {userProfile && (
-              <p className="text-xs text-neutral-400 mt-2">
+              <p className="mt-2 text-xs text-neutral-400">
                 {userProfile.subscriptionTier === 'free' ? (
-                  <>최대 {SUBSCRIPTION_LIMITS.free.maxRecordingMinutes}분 / 월 {SUBSCRIPTION_LIMITS.free.maxDiariesPerMonth}개 일기</>
+                  <>
+                    최대 {SUBSCRIPTION_LIMITS.free.maxRecordingMinutes}분 / 월{' '}
+                    {SUBSCRIPTION_LIMITS.free.maxDiariesPerMonth}개 일기
+                  </>
                 ) : (
                   <>최대 10분 / 무제한 일기</>
                 )}
@@ -254,9 +283,9 @@ export default function RecordPage() {
               <Button
                 size="lg"
                 onClick={handleStartRecording}
-                className="rounded-full w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg transform transition-all hover:scale-105"
+                className="h-16 w-16 transform rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg transition-all hover:scale-105 hover:from-purple-600 hover:to-pink-600"
               >
-                <Mic className="w-6 h-6" />
+                <Mic className="h-6 w-6" />
               </Button>
             )}
 
@@ -266,17 +295,21 @@ export default function RecordPage() {
                   size="lg"
                   variant="outline"
                   onClick={isPaused ? resumeRecording : pauseRecording}
-                  className="rounded-full w-14 h-14"
+                  className="h-14 w-14 rounded-full"
                 >
-                  {isPaused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
+                  {isPaused ? (
+                    <Play className="h-5 w-5" />
+                  ) : (
+                    <Pause className="h-5 w-5" />
+                  )}
                 </Button>
-                
+
                 <Button
                   size="lg"
                   onClick={handleStopRecording}
-                  className="rounded-full w-16 h-16 bg-neutral-900 hover:bg-neutral-800 text-white"
+                  className="h-16 w-16 rounded-full bg-neutral-900 text-white hover:bg-neutral-800"
                 >
-                  <Square className="w-6 h-6" />
+                  <Square className="h-6 w-6" />
                 </Button>
               </>
             )}
@@ -288,21 +321,21 @@ export default function RecordPage() {
                     size="lg"
                     variant="outline"
                     onClick={handleReRecord}
-                    className="rounded-full w-14 h-14"
+                    className="h-14 w-14 rounded-full"
                   >
-                    <RotateCcw className="w-5 h-5" />
+                    <RotateCcw className="h-5 w-5" />
                   </Button>
                   <p className="text-xs text-neutral-500">재녹음</p>
                 </div>
-                
+
                 <div className="flex flex-col items-center gap-2">
                   <Button
                     size="lg"
                     onClick={handleSave}
                     disabled={isProcessing}
-                    className="rounded-full w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg transform transition-all hover:scale-105"
+                    className="h-16 w-16 transform rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg transition-all hover:scale-105 hover:from-purple-600 hover:to-pink-600"
                   >
-                    <Send className="w-6 h-6" />
+                    <Send className="h-6 w-6" />
                   </Button>
                   <p className="text-xs text-neutral-500">
                     {isProcessing ? '처리 중...' : '저장하기'}
@@ -314,26 +347,25 @@ export default function RecordPage() {
         </div>
 
         {/* 팁 카드 */}
-        <Card className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-800">
+        <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50 p-4 dark:border-purple-800 dark:from-purple-900/20 dark:to-pink-900/20">
           <p className="text-sm text-purple-700 dark:text-purple-300">
-            💭 편안한 마음으로 오늘 있었던 일과 느낀 감정을 자유롭게 이야기해주세요
+            💭 편안한 마음으로 오늘 있었던 일과 느낀 감정을 자유롭게
+            이야기해주세요
           </p>
         </Card>
       </div>
-      
+
       {/* 업그레이드 다이얼로그 */}
       <AlertDialog open={showUpgradeDialog} onOpenChange={setShowUpgradeDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>프리미엄 업그레이드</AlertDialogTitle>
-            <AlertDialogDescription>
-              {upgradeMessage}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{upgradeMessage}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={() => setShowUpgradeDialog(false)}
-              className="bg-gray-100 hover:bg-gray-200 text-gray-900"
+              className="bg-gray-100 text-gray-900 hover:bg-gray-200"
             >
               나중에
             </AlertDialogAction>

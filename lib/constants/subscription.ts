@@ -8,7 +8,7 @@ export type SubscriptionTier =
 
 export const SUBSCRIPTION_LIMITS = {
   [SUBSCRIPTION_TIERS.FREE]: {
-    maxRecordingMinutes: 3,
+    maxRecordingMinutes: 1,
     maxDiariesPerMonth: 10,
     features: {
       emotionAnalysis: true,

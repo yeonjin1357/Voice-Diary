@@ -1,6 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { openai, GPT_MODEL } from '@/lib/openai/client';
-import { AnalysisResult, Emotion } from '@/types';
+import { NextRequest, NextResponse } from 'next/server'
+import { openai, GPT_MODEL } from '@/lib/openai/client'
+import { AnalysisResult, Emotion } from '@/types'
+
+const CORRECTION_PROMPT = `당신은 한국어 텍스트 교정 전문가입니다. 음성 인식으로 변환된 텍스트의 오류를 수정해주세요.
+
+주의사항:
+1. 고유명사(지명, 브랜드명, 상호명 등)의 오류를 특히 주의깊게 수정
+2. 문맥상 어색한 단어를 자연스럽게 교정
+3. 원문의 의미와 감정은 그대로 유지
+4. 구어체는 그대로 유지 (친근한 말투 유지)
+
+예시:
+- "공동역" → "공덕역"
+- "실라스티 호수" → "신라스테이"
+
+수정된 텍스트만 반환해주세요.`
 
 const ANALYSIS_PROMPT = `당신은 감정 분석 전문가입니다. 주어진 텍스트를 분석하여 다음 정보를 추출해주세요:
 
@@ -20,19 +34,43 @@ JSON 형식으로 응답해주세요:
   ],
   "keywords": ["가족", "여행", "행복"],
   "summary": "가족과 함께한 여행에서 느낀 행복과 평온함을 표현한 일기입니다."
-}`;
+}`
 
 export async function POST(request: NextRequest) {
   try {
-    const { transcript } = await request.json();
+    const { transcript } = await request.json()
 
     if (!transcript || typeof transcript !== 'string') {
       return NextResponse.json(
         { error: '분석할 텍스트가 제공되지 않았습니다.' },
-        { status: 400 }
-      );
+        { status: 400 },
+      )
     }
 
+    // 1단계: 텍스트 보정
+    const correctionCompletion = await openai.chat.completions.create({
+      model: GPT_MODEL,
+      messages: [
+        {
+          role: 'system',
+          content: CORRECTION_PROMPT,
+        },
+        {
+          role: 'user',
+          content: transcript,
+        },
+      ],
+      temperature: 0.3, // 보정은 정확도가 중요하므로 낮은 temperature
+      max_tokens: 1000,
+    })
+
+    const correctedText =
+      correctionCompletion.choices[0]?.message?.content?.trim()
+    if (!correctedText) {
+      throw new Error('텍스트 보정 결과를 받지 못했습니다.')
+    }
+
+    // 2단계: 보정된 텍스트로 감정 분석
     const completion = await openai.chat.completions.create({
       model: GPT_MODEL,
       messages: [
@@ -42,41 +80,51 @@ export async function POST(request: NextRequest) {
         },
         {
           role: 'user',
-          content: transcript,
+          content: correctedText,
         },
       ],
       response_format: { type: 'json_object' },
       temperature: 0.7,
       max_tokens: 500,
-    });
+    })
 
-    const analysisText = completion.choices[0]?.message?.content;
+    const analysisText = completion.choices[0]?.message?.content
     if (!analysisText) {
-      throw new Error('분석 결과를 받지 못했습니다.');
+      throw new Error('분석 결과를 받지 못했습니다.')
     }
 
-    const analysis: AnalysisResult = JSON.parse(analysisText);
+    const analysis: AnalysisResult = JSON.parse(analysisText)
 
     // 감정 타입 검증
-    const validEmotionTypes = ['기쁨', '슬픔', '불안', '분노', '평온', '기대', '놀람'];
-    analysis.emotions = analysis.emotions.filter((emotion: Emotion) => 
-      validEmotionTypes.includes(emotion.type) && 
-      emotion.score >= 0 && 
-      emotion.score <= 100
-    );
+    const validEmotionTypes = [
+      '기쁨',
+      '슬픔',
+      '불안',
+      '분노',
+      '평온',
+      '기대',
+      '놀람',
+    ]
+    analysis.emotions = analysis.emotions.filter(
+      (emotion: Emotion) =>
+        validEmotionTypes.includes(emotion.type) &&
+        emotion.score >= 0 &&
+        emotion.score <= 100,
+    )
 
     // 감정 점수 기준으로 정렬
-    analysis.emotions.sort((a, b) => b.score - a.score);
+    analysis.emotions.sort((a, b) => b.score - a.score)
 
     return NextResponse.json({
       success: true,
       analysis,
-    });
+      correctedTranscript: correctedText, // 보정된 텍스트 반환
+    })
   } catch (error) {
-    console.error('감정 분석 API 오류:', error);
+    console.error('감정 분석 API 오류:', error)
     return NextResponse.json(
       { error: '감정 분석 중 오류가 발생했습니다.' },
-      { status: 500 }
-    );
+      { status: 500 },
+    )
   }
 }

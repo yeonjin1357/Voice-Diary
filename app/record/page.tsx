@@ -5,11 +5,21 @@ import { MobileLayout } from '@/components/layout/mobile-layout'
 import { useRecorder } from '@/hooks/useRecorder'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Mic, Square, Pause, Play, Send, RotateCcw } from 'lucide-react'
+import { Mic, Square, Pause, Play, Send, RotateCcw, Edit3 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
+import { Textarea } from '@/components/ui/textarea'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { FullScreenLoader } from '@/components/ui/full-screen-loader'
 
 export default function RecordPage() {
   const router = useRouter()
@@ -27,6 +37,10 @@ export default function RecordPage() {
 
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [transcript, setTranscript] = useState<string>('')
+  const [editedTranscript, setEditedTranscript] = useState<string>('')
+  const [showEditDialog, setShowEditDialog] = useState(false)
+  const [loadingMessage, setLoadingMessage] = useState('')
   const supabase = createClient()
 
   useEffect(() => {
@@ -91,10 +105,11 @@ export default function RecordPage() {
     resetRecording()
   }
 
-  const handleSave = async () => {
+  const handleTranscribe = async () => {
     if (!audioBlob) return
 
     setIsProcessing(true)
+    setLoadingMessage('음성을 텍스트로 변환하고 있습니다')
     try {
       // 1. Whisper API로 음성을 텍스트로 변환
       const formData = new FormData()
@@ -109,7 +124,26 @@ export default function RecordPage() {
         throw new Error('음성을 텍스트로 변환하는데 실패했습니다')
       }
 
-      const { transcript } = await transcriptResponse.json()
+      const { transcript: text } = await transcriptResponse.json()
+      setTranscript(text)
+      setEditedTranscript(text)
+      setShowEditDialog(true)
+    } catch (error) {
+      console.error('변환 실패:', error)
+      if (error instanceof Error) {
+        toast.error(error.message)
+      } else {
+        toast.error('음성 변환 중 오류가 발생했습니다')
+      }
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  const handleSaveWithTranscript = async (finalTranscript: string) => {
+    setIsProcessing(true)
+    setLoadingMessage('감정을 분석하고 일기를 저장하고 있습니다')
+    try {
 
       // 2. GPT-4로 감정 분석
       const analysisResponse = await fetch('/api/analyze', {
@@ -117,7 +151,7 @@ export default function RecordPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ transcript }),
+        body: JSON.stringify({ transcript: finalTranscript }),
       })
 
       if (!analysisResponse.ok) {
@@ -288,14 +322,14 @@ export default function RecordPage() {
                 <div className="flex flex-col items-center gap-2">
                   <Button
                     size="lg"
-                    onClick={handleSave}
+                    onClick={handleTranscribe}
                     disabled={isProcessing}
                     className="h-16 w-16 transform rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg transition-all hover:scale-105 hover:from-purple-600 hover:to-pink-600"
                   >
                     <Send className="h-6 w-6" />
                   </Button>
                   <p className="text-xs text-neutral-500">
-                    {isProcessing ? '처리 중...' : '저장하기'}
+                    {isProcessing ? '변환 중...' : '저장하기'}
                   </p>
                 </div>
               </div>
@@ -311,6 +345,69 @@ export default function RecordPage() {
           </p>
         </Card>
       </div>
+
+      {/* 텍스트 편집 다이얼로그 */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="mx-4 max-h-[90vh] max-w-[500px] overflow-y-auto rounded-2xl bg-white p-0 shadow-xl">
+          <DialogHeader className="border-b border-gray-100 px-6 py-5">
+            <DialogTitle className="text-xl font-semibold text-gray-900">
+              음성 인식 결과
+            </DialogTitle>
+            <DialogDescription className="mt-1.5 text-sm text-gray-500">
+              잘못 인식된 부분이 있다면 수정해주세요
+            </DialogDescription>
+          </DialogHeader>
+          <div className="px-6 py-5">
+            <div className="space-y-4">
+              <div>
+                <label className="mb-3 block text-sm font-medium text-gray-700">
+                  변환된 텍스트
+                </label>
+                <Textarea
+                  value={editedTranscript}
+                  onChange={(e) => setEditedTranscript(e.target.value)}
+                  className="min-h-[240px] resize-none rounded-xl border-gray-200 bg-gray-50 px-4 py-3 text-[15px] leading-relaxed placeholder:text-gray-400 focus:border-purple-300 focus:bg-white focus:ring-2 focus:ring-purple-100"
+                  placeholder="텍스트를 입력하세요..."
+                />
+              </div>
+              <div className="flex items-start gap-2.5 rounded-lg bg-purple-50 p-3.5">
+                <Edit3 className="mt-0.5 h-4 w-4 flex-shrink-0 text-purple-600" />
+                <p className="text-sm leading-relaxed text-purple-700">
+                  직접 수정하여 더 정확한 일기를 작성할 수 있어요
+                </p>
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="border-t border-gray-100 bg-gray-50 px-6 py-4">
+            <div className="flex w-full gap-3">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowEditDialog(false)
+                  setTranscript('')
+                  setEditedTranscript('')
+                }}
+                className="flex-1 rounded-xl border-gray-200 bg-white py-6 text-gray-700 hover:bg-gray-50"
+              >
+                다시 녹음
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowEditDialog(false)
+                  handleSaveWithTranscript(editedTranscript)
+                }}
+                disabled={!editedTranscript.trim()}
+                className="flex-1 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 py-6 text-white shadow-md hover:from-purple-600 hover:to-pink-600 disabled:opacity-50"
+              >
+                일기 저장
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 전체 화면 로딩 */}
+      {isProcessing && <FullScreenLoader message={loadingMessage} />}
     </MobileLayout>
   )
 }

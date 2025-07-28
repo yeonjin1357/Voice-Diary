@@ -43,6 +43,8 @@ export async function POST(request: NextRequest) {
         model: WHISPER_MODEL,
         language: 'ko',
         response_format: 'text',
+        prompt: '한국어로 말하고 있습니다. 일기를 작성하기 위해 오늘 있었던 일과 감정에 대해 이야기하고 있습니다.',
+        temperature: 0.2 // 더 정확한 변환을 위해 낮은 temperature
       })
 
       return NextResponse.json({

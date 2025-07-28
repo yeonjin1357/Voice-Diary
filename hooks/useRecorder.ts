@@ -85,7 +85,10 @@ export function useRecorder(): UseRecorderReturn {
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
-          sampleRate: 44100
+          autoGainControl: true,
+          sampleRate: 48000, // Whisper 최적 샘플링 레이트
+          channelCount: 1, // 모노 녹음 (파일 크기 최적화)
+          sampleSize: 16
         } 
       }).catch((err) => {
         console.error('getUserMedia error:', err)
@@ -117,6 +120,8 @@ export function useRecorder(): UseRecorderReturn {
       
       // MediaRecorder setup - 더 넓은 브라우저 지원을 위한 MIME 타입 체크
       let mimeType = 'audio/webm'
+      let audioBitsPerSecond = 128000 // 128kbps for better quality
+      
       const possibleTypes = [
         'audio/webm;codecs=opus',
         'audio/webm',
@@ -134,7 +139,10 @@ export function useRecorder(): UseRecorderReturn {
       
       console.log('Using MIME type:', mimeType)
       
-      mediaRecorderRef.current = new MediaRecorder(stream, { mimeType })
+      mediaRecorderRef.current = new MediaRecorder(stream, { 
+        mimeType,
+        audioBitsPerSecond 
+      })
       chunksRef.current = []
       
       mediaRecorderRef.current.ondataavailable = (event) => {

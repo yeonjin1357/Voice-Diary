@@ -10,17 +10,6 @@ import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
-import { useSubscription } from '@/hooks/useSubscription'
-import { SUBSCRIPTION_LIMITS } from '@/lib/constants/subscription'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
 
 export default function RecordPage() {
   const router = useRouter()
@@ -38,11 +27,7 @@ export default function RecordPage() {
 
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
-  const [showUpgradeDialog, setShowUpgradeDialog] = useState(false)
-  const [upgradeMessage, setUpgradeMessage] = useState('')
   const supabase = createClient()
-  const { userProfile, canCreateDiary, updateUsage, getUsageInfo } =
-    useSubscription()
 
   useEffect(() => {
     const checkUser = async () => {
@@ -66,15 +51,16 @@ export default function RecordPage() {
 
   const handleStartRecording = async () => {
     try {
-      // 월 일기 개수 체크
-      const canCreate = await canCreateDiary()
-      if (!canCreate && userProfile?.subscriptionTier === 'free') {
-        await getUsageInfo()
-        const limit = SUBSCRIPTION_LIMITS.free.maxDiariesPerMonth
-        setUpgradeMessage(
-          `이번 달 무료 일기 작성 한도(${limit}개)에 도달했습니다. 프리미엄으로 업그레이드하여 무제한으로 일기를 작성하세요!`,
-        )
-        setShowUpgradeDialog(true)
+      // 하루 일기 개수 체크
+      const today = new Date().toISOString().split('T')[0]
+      const { data: todayDiaries, error } = await supabase
+        .from('diary_entries')
+        .select('id')
+        .eq('date', today)
+        .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
+
+      if (!error && todayDiaries && todayDiaries.length >= 2) {
+        toast.error('하루에 최대 2개의 일기만 작성할 수 있습니다')
         return
       }
 
@@ -91,18 +77,6 @@ export default function RecordPage() {
   }
 
   const handleStopRecording = useCallback(async () => {
-    // 녹음 시간 제한 체크
-    if (userProfile?.subscriptionTier === 'free') {
-      const maxMinutes = SUBSCRIPTION_LIMITS.free.maxRecordingMinutes
-      if (recordingTime > maxMinutes * 60) {
-        setUpgradeMessage(
-          `무료 회원은 최대 ${maxMinutes}분까지 녹음할 수 있습니다. 프리미엄으로 업그레이드하여 최대 10분까지 녹음하세요!`,
-        )
-        setShowUpgradeDialog(true)
-        // 녹음 강제 중지
-      }
-    }
-
     const blob = await stopRecording()
     if (blob) {
       setAudioBlob(blob)
@@ -110,7 +84,7 @@ export default function RecordPage() {
         '녹음이 완료되었습니다! 저장 버튼을 눌러 일기를 작성하세요.',
       )
     }
-  }, [recordingTime, stopRecording, userProfile?.subscriptionTier])
+  }, [stopRecording])
 
   const handleReRecord = () => {
     setAudioBlob(null)
@@ -178,10 +152,7 @@ export default function RecordPage() {
 
       const { diaryId } = await diaryResponse.json()
 
-      // 4. 사용량 업데이트
-      await updateUsage(Math.ceil(recordingTime / 60))
-
-      // 5. 일기 상세 페이지로 이동
+      // 4. 일기 상세 페이지로 이동
       router.push(`/diary/${diaryId}`)
     } catch (error) {
       console.error('저장 실패:', error)
@@ -203,17 +174,14 @@ export default function RecordPage() {
 
   // 녹음 시간 제한 체크 (실시간)
   useEffect(() => {
-    if (isRecording && userProfile?.subscriptionTier === 'free') {
-      const maxSeconds = SUBSCRIPTION_LIMITS.free.maxRecordingMinutes * 60
+    if (isRecording) {
+      const maxSeconds = 3 * 60 // 3분
       if (recordingTime >= maxSeconds) {
         handleStopRecording()
-        setUpgradeMessage(
-          `무료 회원은 최대 ${SUBSCRIPTION_LIMITS.free.maxRecordingMinutes}분까지 녹음할 수 있습니다. 프리미엄으로 업그레이드하여 최대 10분까지 녹음하세요!`,
-        )
-        setShowUpgradeDialog(true)
+        toast.error('최대 녹음 시간(3분)에 도달했습니다')
       }
     }
-  }, [recordingTime, isRecording, userProfile, handleStopRecording])
+  }, [recordingTime, isRecording, handleStopRecording])
 
   return (
     <MobileLayout header={header}>
@@ -263,18 +231,7 @@ export default function RecordPage() {
                   : '녹음 시작을 눌러주세요'}
             </p>
             {/* 녹음 시간 제한 표시 */}
-            {userProfile && (
-              <p className="mt-2 text-xs text-neutral-400">
-                {userProfile.subscriptionTier === 'free' ? (
-                  <>
-                    최대 {SUBSCRIPTION_LIMITS.free.maxRecordingMinutes}분 / 월{' '}
-                    {SUBSCRIPTION_LIMITS.free.maxDiariesPerMonth}개 일기
-                  </>
-                ) : (
-                  <>최대 10분 / 무제한 일기</>
-                )}
-              </p>
-            )}
+            <p className="mt-2 text-xs text-neutral-400">최대 3분</p>
           </div>
 
           {/* 컨트롤 버튼 */}
@@ -354,30 +311,6 @@ export default function RecordPage() {
           </p>
         </Card>
       </div>
-
-      {/* 업그레이드 다이얼로그 */}
-      <AlertDialog open={showUpgradeDialog} onOpenChange={setShowUpgradeDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>프리미엄 업그레이드</AlertDialogTitle>
-            <AlertDialogDescription>{upgradeMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction
-              onClick={() => setShowUpgradeDialog(false)}
-              className="bg-gray-100 text-gray-900 hover:bg-gray-200"
-            >
-              나중에
-            </AlertDialogAction>
-            <AlertDialogAction
-              onClick={() => router.push('/subscription')}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 text-white"
-            >
-              업그레이드하기
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </MobileLayout>
   )
 }

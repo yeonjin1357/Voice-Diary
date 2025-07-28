@@ -3,17 +3,13 @@
 import { useEffect, useState } from 'react'
 import { MobileLayout } from '@/components/layout/mobile-layout'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import {
   User,
-  Crown,
   Calendar,
   FileText,
   Settings,
   LogOut,
   ChevronRight,
-  Sparkles,
-  BarChart3,
   Bell,
   Shield,
   HelpCircle,
@@ -23,8 +19,6 @@ import {
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
-import { useSubscription } from '@/hooks/useSubscription'
-import { format } from 'date-fns'
 
 interface MenuItem {
   icon: LucideIcon
@@ -33,10 +27,6 @@ interface MenuItem {
   onClick: () => void
   showArrow: boolean
   disabled?: boolean
-  badge?: {
-    text: string
-    color: string
-  }
 }
 
 interface MenuSection {
@@ -47,7 +37,6 @@ interface MenuSection {
 export default function ProfilePage() {
   const router = useRouter()
   const supabase = createClient()
-  const { userProfile, getUsageInfo } = useSubscription()
   const [user, setUser] = useState<{
     id: string
     email?: string
@@ -56,10 +45,6 @@ export default function ProfilePage() {
       avatar_url?: string
       [key: string]: unknown
     }
-  } | null>(null)
-  const [usage, setUsage] = useState<{
-    diary_count: number
-    total_recording_minutes: number
   } | null>(null)
   const [diaryCount, setDiaryCount] = useState(0)
 
@@ -86,16 +71,6 @@ export default function ProfilePage() {
     fetchUserData()
   }, [router, supabase])
 
-  useEffect(() => {
-    const fetchUsageData = async () => {
-      const usageInfo = await getUsageInfo()
-      setUsage(usageInfo)
-    }
-    
-    if (userProfile) {
-      fetchUsageData()
-    }
-  }, [userProfile, getUsageInfo])
 
 
   const handleLogout = async () => {
@@ -119,38 +94,6 @@ export default function ProfilePage() {
   )
 
   const menuSections: MenuSection[] = [
-    {
-      title: '구독 및 결제',
-      items: [
-        {
-          icon: Crown,
-          title: '구독 관리',
-          subtitle:
-            userProfile?.subscriptionTier === 'premium'
-              ? '프리미엄 이용 중'
-              : '무료 플랜 이용 중',
-          badge:
-            userProfile?.subscriptionTier === 'premium'
-              ? {
-                  text: 'Premium',
-                  color:
-                    'bg-gradient-to-r from-purple-500 to-pink-500 text-white',
-                }
-              : undefined,
-          onClick: () => router.push('/subscription'),
-          showArrow: true,
-        },
-        {
-          icon: BarChart3,
-          title: '이용 현황',
-          subtitle: usage
-            ? `이번 달: 일기 ${usage.diary_count}개, 녹음 ${usage.total_recording_minutes}분`
-            : '로딩 중...',
-          onClick: () => router.push('/insights'),
-          showArrow: true,
-        },
-      ],
-    },
     {
       title: '내 활동',
       items: [
@@ -221,52 +164,24 @@ export default function ProfilePage() {
         {/* 사용자 정보 섹션 */}
         <div className="mb-2 bg-white px-5 py-6">
           <div className="flex items-center space-x-4">
-            <div className="relative">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-purple-100 to-pink-100">
-                {userProfile?.avatarUrl ? (
-                  <div
-                    style={{ backgroundImage: `url(${userProfile.avatarUrl})` }}
-                    className="h-full w-full rounded-full bg-cover bg-center"
-                  />
-                ) : (
-                  <User className="h-8 w-8 text-purple-600" />
-                )}
-              </div>
-              {userProfile?.subscriptionTier === 'premium' && (
-                <div className="absolute -right-1 -bottom-1 flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500">
-                  <Crown className="h-3 w-3 text-white" />
-                </div>
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-purple-100 to-pink-100">
+              {user?.user_metadata?.avatar_url ? (
+                <div
+                  style={{ backgroundImage: `url(${user.user_metadata.avatar_url})` }}
+                  className="h-full w-full rounded-full bg-cover bg-center"
+                />
+              ) : (
+                <User className="h-8 w-8 text-purple-600" />
               )}
             </div>
             <div className="flex-1">
               <h2 className="text-lg font-semibold text-gray-900">
-                {userProfile?.name || user?.email?.split('@')[0]}
+                {user?.user_metadata?.full_name || user?.email?.split('@')[0]}
               </h2>
               <p className="text-sm text-gray-500">{user?.email}</p>
             </div>
           </div>
 
-          {/* 프리미엄 상태 카드 */}
-          {userProfile?.subscriptionTier === 'premium' &&
-            userProfile?.subscriptionEndDate && (
-              <div className="mt-4 rounded-xl bg-gradient-to-r from-purple-50 to-pink-50 p-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-purple-600" />
-                    <span className="text-sm font-medium text-purple-900">
-                      프리미엄 멤버십
-                    </span>
-                  </div>
-                  <span className="text-xs text-purple-700">
-                    {format(
-                      new Date(userProfile.subscriptionEndDate),
-                      'yyyy.MM.dd',
-                    )}
-                    까지
-                  </span>
-                </div>
-              </div>
-            )}
         </div>
 
         {/* 메뉴 섹션들 */}
@@ -302,13 +217,6 @@ export default function ProfilePage() {
                         <p className="text-[15px] font-medium text-gray-900">
                           {item.title}
                         </p>
-                        {item.badge && (
-                          <Badge
-                            className={`px-1.5 py-0 text-[10px] ${item.badge.color}`}
-                          >
-                            {item.badge.text}
-                          </Badge>
-                        )}
                       </div>
                       <p className="text-[13px] text-gray-500">
                         {item.subtitle}

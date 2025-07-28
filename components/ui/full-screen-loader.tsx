@@ -23,7 +23,7 @@ export function FullScreenLoader({ message = '처리 중입니다...' }: FullScr
           {/* 외곽 원 */}
           <div className="absolute inset-0 animate-ping rounded-full bg-purple-400 opacity-20"></div>
           {/* 중간 원 */}
-          <div className="absolute inset-2 animate-ping rounded-full bg-purple-400 opacity-40 animation-delay-200"></div>
+          <div className="absolute inset-2 animate-ping rounded-full bg-purple-400 opacity-40" style={{ animationDelay: '0.2s' }}></div>
           {/* 내부 원 */}
           <div className="absolute inset-4 animate-pulse rounded-full bg-gradient-to-r from-purple-500 to-pink-500"></div>
         </div>
@@ -35,18 +35,6 @@ export function FullScreenLoader({ message = '처리 중입니다...' }: FullScr
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes ping {
-          75%, 100% {
-            transform: scale(2);
-            opacity: 0;
-          }
-        }
-        
-        .animation-delay-200 {
-          animation-delay: 0.2s;
-        }
-      `}</style>
     </div>
   )
 }

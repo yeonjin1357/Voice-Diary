@@ -10,6 +10,11 @@ export const metadata: Metadata = {
   title: '울림 - 마음을 담는 음성 일기',
   description: '매일의 음성 일기를 녹음하고 AI를 통해 감정 분석과 인사이트를 제공합니다',
   manifest: '/manifest.json',
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/favicon.ico',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
-import { DiaryEntry, Emotion } from '@/types';
+import { DiaryEntryWithRelations, Emotion } from '@/types';
+import { ApiError, handleApiError } from '@/lib/api-utils';
 
 // GET: 일기 목록 조회
 export async function GET(request: NextRequest) {
@@ -10,7 +11,7 @@ export async function GET(request: NextRequest) {
     // 사용자 인증 확인
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
-      return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
+      throw new ApiError('인증이 필요합니다.', 401);
     }
 
     // URL 파라미터에서 검색 조건 추출
@@ -78,10 +79,10 @@ export async function GET(request: NextRequest) {
     if (error) throw error;
 
     // 데이터 형식 변환
-    const diaryEntries: DiaryEntry[] = data.map(entry => ({
+    const diaryEntries: DiaryEntryWithRelations[] = data.map(entry => ({
       id: entry.id,
       userId: entry.user_id,
-      date: new Date(entry.date),
+      date: entry.date,
       audioUrl: entry.audio_url,
       transcript: entry.transcript,
       summary: entry.summary,
@@ -90,17 +91,13 @@ export async function GET(request: NextRequest) {
         score: e.score,
       })),
       keywords: entry.keywords.map((k: { keyword: string }) => k.keyword),
-      createdAt: new Date(entry.created_at),
-      updatedAt: new Date(entry.updated_at),
+      createdAt: entry.created_at,
+      updatedAt: entry.updated_at,
     }));
 
     return NextResponse.json({ diaries: diaryEntries });
   } catch (error) {
-    console.error('일기 목록 조회 오류:', error);
-    return NextResponse.json(
-      { error: '일기 목록을 불러오는 중 오류가 발생했습니다.' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
@@ -112,8 +109,7 @@ export async function POST(request: NextRequest) {
     // 사용자 인증 확인
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
-      console.error('인증 오류:', authError);
-      return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
+      throw new ApiError('인증이 필요합니다.', 401);
     }
 
     const body = await request.json();
@@ -121,10 +117,7 @@ export async function POST(request: NextRequest) {
 
     // 필수 필드 검증
     if (!date || !transcript || !summary) {
-      return NextResponse.json(
-        { error: '필수 정보가 누락되었습니다.' },
-        { status: 400 }
-      );
+      throw new ApiError('필수 정보가 누락되었습니다.', 400);
     }
 
     // 트랜잭션으로 일기 저장
@@ -141,7 +134,6 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (diaryError) {
-      console.error('일기 저장 실패:', diaryError);
       throw diaryError;
     }
 
@@ -158,7 +150,6 @@ export async function POST(request: NextRequest) {
         .insert(emotionData);
 
       if (emotionError) {
-        console.error('감정 데이터 저장 실패:', emotionError);
         throw emotionError;
       }
     }
@@ -175,7 +166,6 @@ export async function POST(request: NextRequest) {
         .insert(keywordData);
 
       if (keywordError) {
-        console.error('키워드 데이터 저장 실패:', keywordError);
         throw keywordError;
       }
     }
@@ -185,10 +175,6 @@ export async function POST(request: NextRequest) {
       diaryId: diary.id,
     });
   } catch (error) {
-    console.error('일기 생성 오류:', error);
-    return NextResponse.json(
-      { error: '일기 저장 중 오류가 발생했습니다.' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

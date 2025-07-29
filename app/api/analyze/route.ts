@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { openai, GPT_MODEL } from '@/lib/openai/client'
 import { AnalysisResult, Emotion } from '@/types'
+import { ApiError, handleApiError } from '@/lib/api-utils'
 
 const CORRECTION_PROMPT = `당신은 한국어 텍스트 교정 전문가입니다. 음성 인식으로 변환된 텍스트의 오류를 수정해주세요.
 
@@ -41,10 +42,7 @@ export async function POST(request: NextRequest) {
     const { transcript } = await request.json()
 
     if (!transcript || typeof transcript !== 'string') {
-      return NextResponse.json(
-        { error: '분석할 텍스트가 제공되지 않았습니다.' },
-        { status: 400 },
-      )
+      throw new ApiError('분석할 텍스트가 제공되지 않았습니다.', 400)
     }
 
     // 1단계: 텍스트 보정
@@ -121,10 +119,6 @@ export async function POST(request: NextRequest) {
       correctedTranscript: correctedText, // 보정된 텍스트 반환
     })
   } catch (error) {
-    console.error('감정 분석 API 오류:', error)
-    return NextResponse.json(
-      { error: '감정 분석 중 오류가 발생했습니다.' },
-      { status: 500 },
-    )
+    return handleApiError(error)
   }
 }

@@ -24,7 +24,7 @@ export async function DELETE() {
       .eq('user_id', user.id)
 
     if (diaryError) {
-      console.error('Failed to delete diary entries:', diaryError)
+      // Failed to delete diary entries: diaryError
       return NextResponse.json(
         { error: '일기 데이터 삭제 중 오류가 발생했습니다' },
         { status: 500 }
@@ -43,8 +43,8 @@ export async function DELETE() {
           .from('voice-recordings')
           .remove(filePaths)
       }
-    } catch (storageError) {
-      console.error('Failed to delete audio files:', storageError)
+    } catch {
+      // Failed to delete audio files: storageError
       // Storage 삭제 실패는 무시하고 계속 진행
     }
 
@@ -55,7 +55,7 @@ export async function DELETE() {
       .eq('user_id', user.id)
     
     if (contactsError) {
-      console.log('Failed to delete contacts (table may not exist):', contactsError)
+      // Failed to delete contacts (table may not exist): contactsError
       // contacts 테이블이 없거나 삭제 실패해도 무시하고 계속 진행
     }
 
@@ -68,9 +68,9 @@ export async function DELETE() {
       if (deleteError) {
         throw deleteError
       }
-    } catch (adminError) {
+    } catch {
       // Service role key가 없거나 admin API 사용 불가능한 경우
-      console.error('Admin delete failed:', adminError)
+      // Admin delete failed: adminError
       
       // 대체 방법: Database Function을 사용하여 삭제
       const { error: functionError } = await supabase.rpc('delete_user', { 
@@ -78,7 +78,7 @@ export async function DELETE() {
       })
       
       if (functionError) {
-        console.error('Function delete also failed:', functionError)
+        // Function delete also failed: functionError
         // 현재 세션만 종료하고 수동 삭제 필요함을 알림
         await supabase.auth.signOut()
         
@@ -98,8 +98,8 @@ export async function DELETE() {
       message: '회원 탈퇴가 완료되었습니다'
     })
 
-  } catch (error) {
-    console.error('Account deletion error:', error)
+  } catch {
+    // Account deletion error: error
     return NextResponse.json(
       { error: '회원 탈퇴 처리 중 오류가 발생했습니다' },
       { status: 500 }

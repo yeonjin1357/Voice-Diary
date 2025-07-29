@@ -44,7 +44,7 @@ export function AudioPlayer({ audioUrl, fileName = 'recording.webm', initialDura
     let seekAttempted = false
 
     const setAudioData = async () => {
-      console.log('Audio duration:', audio.duration, 'readyState:', audio.readyState, 'initialDuration:', initialDuration)
+      // Audio duration: audio.duration, readyState: audio.readyState, initialDuration: initialDuration
       
       // initialDuration이 있으면 그것을 우선 사용
       if (initialDuration && initialDuration > 0) {
@@ -70,8 +70,8 @@ export function AudioPlayer({ audioUrl, fileName = 'recording.webm', initialDura
             setDuration(seekDuration)
             setIsAudioReady(true)
           }
-        } catch (error) {
-          console.error('Failed to get duration from seek:', error)
+        } catch {
+          // Failed to get duration from seek: error
         }
       }
       setCurrentTime(audio.currentTime)
@@ -96,7 +96,7 @@ export function AudioPlayer({ audioUrl, fileName = 'recording.webm', initialDura
     }
 
     const handleCanPlay = () => {
-      console.log('Can play event fired')
+      // Can play event fired
       setAudioData()
     }
 
@@ -162,8 +162,8 @@ export function AudioPlayer({ audioUrl, fileName = 'recording.webm', initialDura
         await audio.play()
         setIsPlaying(true)
       }
-    } catch (error) {
-      console.error('Error playing audio:', error)
+    } catch {
+      // Error playing audio: error
     } finally {
       setIsLoading(false)
     }
@@ -195,8 +195,8 @@ export function AudioPlayer({ audioUrl, fileName = 'recording.webm', initialDura
       a.click()
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
-    } catch (error) {
-      console.error('Download error:', error)
+    } catch {
+      // Download error: error
     }
   }
 

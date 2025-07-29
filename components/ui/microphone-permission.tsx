@@ -32,8 +32,8 @@ export function MicrophonePermission() {
       // 권한 획득 성공 - 스트림 정리
       stream.getTracks().forEach(track => track.stop())
       setShowBanner(false)
-    } catch (error) {
-      console.error('마이크 권한 요청 실패:', error)
+    } catch {
+      // 마이크 권한 요청 실패: error
     }
   }
 

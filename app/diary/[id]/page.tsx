@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { MobileLayout } from '@/components/layout/mobile-layout'
-import { DiaryEntry } from '@/types'
+import { DiaryEntryWithRelations, Keyword } from '@/types'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { AudioPlayer } from '@/components/audio-player'
@@ -44,7 +44,7 @@ const emotionGradients = {
 
 export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
   const router = useRouter()
-  const [diary, setDiary] = useState<DiaryEntry | null>(null)
+  const [diary, setDiary] = useState<DiaryEntryWithRelations | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -83,9 +83,9 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
 
       const { diary } = await response.json()
       setDiary(diary)
-      setEditedSummary(diary.summary)
-      setEditedTranscript(diary.transcript)
-      setEditedKeywords(diary.keywords)
+      setEditedSummary(diary.summary || '')
+      setEditedTranscript(diary.transcript || '')
+      setEditedKeywords(diary.keywords?.map((k: Keyword) => k.keyword) || [])
     } catch (err) {
       setError(err instanceof Error ? err.message : '오류가 발생했습니다.')
     } finally {
@@ -122,9 +122,9 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
   const handleCancelEdit = () => {
     setIsEditing(false)
     if (diary) {
-      setEditedSummary(diary.summary)
-      setEditedTranscript(diary.transcript)
-      setEditedKeywords(diary.keywords)
+      setEditedSummary(diary.summary || '')
+      setEditedTranscript(diary.transcript || '')
+      setEditedKeywords(diary.keywords?.map((k: Keyword) => k.keyword) || [])
     }
   }
 
@@ -169,12 +169,12 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
     setEditedKeywords(editedKeywords.filter((k) => k !== keyword))
   }
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | string) => {
     const d = new Date(date)
     return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`
   }
 
-  const getDayOfWeek = (date: Date) => {
+  const getDayOfWeek = (date: Date | string) => {
     const days = [
       '일요일',
       '월요일',
@@ -396,13 +396,13 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
               </div>
             ) : (
               <div className="flex flex-wrap items-center gap-2">
-                {diary.keywords.map((keyword) => (
+                {diary.keywords.map((k: Keyword) => (
                   <div
-                    key={keyword}
+                    key={k.keyword}
                     className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5"
                   >
                     <Hash className="h-3 w-3 text-gray-500" />
-                    <span className="text-sm text-gray-700">{keyword}</span>
+                    <span className="text-sm text-gray-700">{k.keyword}</span>
                   </div>
                 ))}
               </div>

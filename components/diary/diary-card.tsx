@@ -1,11 +1,11 @@
 'use client'
 
-import { DiaryEntry } from '@/types'
+import { DiaryEntryWithRelations, Emotion } from '@/types'
 import { Calendar, Hash } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface DiaryCardProps {
-  diary: DiaryEntry
+  diary: DiaryEntryWithRelations
   onClick?: () => void
 }
 
@@ -32,7 +32,7 @@ export function DiaryCard({ diary, onClick }: DiaryCardProps) {
 
   // 상위 2개 감정만 표시
   const topEmotions = diary.emotions
-    .sort((a, b) => b.score - a.score)
+    .sort((a: Emotion, b: Emotion) => b.score - a.score)
     .slice(0, 2)
 
   return (
@@ -43,14 +43,14 @@ export function DiaryCard({ diary, onClick }: DiaryCardProps) {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2 text-sm text-gray-500">
           <Calendar className="h-4 w-4" />
-          <span className="font-medium">{formatDate(diary.date)}</span>
-          <span className="text-gray-400">({getDayOfWeek(diary.date)})</span>
+          <span className="font-medium">{formatDate(new Date(diary.date))}</span>
+          <span className="text-gray-400">({getDayOfWeek(new Date(diary.date))})</span>
         </div>
       </div>
       <div className="space-y-3">
         {/* 감정 표시 */}
         <div className="flex gap-2">
-          {topEmotions.map((emotion) => (
+          {topEmotions.map((emotion: Emotion) => (
             <span
               key={emotion.type}
               className={cn(
@@ -69,10 +69,10 @@ export function DiaryCard({ diary, onClick }: DiaryCardProps) {
         </p>
 
         {/* 키워드 */}
-        {diary.keywords.length > 0 && (
+        {diary.keywords && diary.keywords.length > 0 && (
           <div className="flex items-center gap-2 flex-wrap">
             <Hash className="h-3 w-3 text-gray-400" />
-            {diary.keywords.slice(0, 3).map((keyword) => (
+            {diary.keywords.slice(0, 3).map(({ keyword }: { keyword: string }) => (
               <span
                 key={keyword}
                 className="text-xs text-gray-500"
@@ -80,7 +80,7 @@ export function DiaryCard({ diary, onClick }: DiaryCardProps) {
                 {keyword}
               </span>
             ))}
-            {diary.keywords.length > 3 && (
+            {diary.keywords && diary.keywords.length > 3 && (
               <span className="text-xs text-gray-400">
                 +{diary.keywords.length - 3}
               </span>

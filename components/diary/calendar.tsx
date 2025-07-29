@@ -5,13 +5,13 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, addMonths, subMonths, isToday } from 'date-fns'
 import { ko } from 'date-fns/locale'
-import { DiaryEntry } from '@/types'
+import { DiaryEntryWithRelations } from '@/types'
 
 interface CalendarProps {
   selectedDate: Date | null
   onDateSelect: (date: Date) => void
   diaryDates: Date[] // 일기가 있는 날짜들
-  diaries?: DiaryEntry[] // 일기 데이터 추가
+  diaries?: DiaryEntryWithRelations[] // 일기 데이터 추가
   className?: string
 }
 

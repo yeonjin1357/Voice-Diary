@@ -81,7 +81,7 @@ export default function RecordPage() {
       await startRecording()
       setAudioBlob(null)
     } catch (error) {
-      console.error('녹음 시작 실패:', error)
+      // 녹음 시작 실패: error
       if (error instanceof Error) {
         toast.error(error.message)
       } else {
@@ -128,7 +128,7 @@ export default function RecordPage() {
       setEditedTranscript(text)
       setShowEditDialog(true)
     } catch (error) {
-      console.error('변환 실패:', error)
+      // 변환 실패: error
       if (error instanceof Error) {
         toast.error(error.message)
       } else {
@@ -154,7 +154,7 @@ export default function RecordPage() {
         const today = new Date().toISOString().split('T')[0]
         audioUrl = await uploadAudioFile(user.data.user.id, audioBlob, today)
         if (!audioUrl) {
-          console.warn('음성 파일 업로드 실패, 계속 진행합니다')
+          // 음성 파일 업로드 실패, 계속 진행합니다
         }
       }
 
@@ -194,7 +194,7 @@ export default function RecordPage() {
 
       if (!diaryResponse.ok) {
         const errorData = await diaryResponse.json()
-        console.error('일기 저장 실패:', errorData)
+        // 일기 저장 실패: errorData
         throw new Error(errorData.error || '일기 저장에 실패했습니다')
       }
 
@@ -203,7 +203,7 @@ export default function RecordPage() {
       // 4. 일기 상세 페이지로 이동
       router.push(`/diary/${diaryId}`)
     } catch (error) {
-      console.error('저장 실패:', error)
+      // 저장 실패: error
       if (error instanceof Error) {
         toast.error(error.message)
       } else {

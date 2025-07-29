@@ -51,6 +51,7 @@ export default function ProfilePage() {
     user_metadata?: {
       full_name?: string
       avatar_url?: string
+      name?: string
       [key: string]: unknown
     }
   } | null>(null)
@@ -77,11 +78,9 @@ export default function ProfilePage() {
 
       setDiaryCount(count || 0)
     }
-    
+
     fetchUserData()
   }, [router, supabase])
-
-
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -102,15 +101,15 @@ export default function ProfilePage() {
       }
 
       const result = await response.json()
-      
+
       toast.success(result.message || '회원 탈퇴가 완료되었습니다')
       router.push('/auth/login')
     } catch (error) {
-      console.error('Delete account error:', error)
+      // Delete account error: error
       toast.error(
-        error instanceof Error 
-          ? error.message 
-          : '회원 탈퇴 중 오류가 발생했습니다'
+        error instanceof Error
+          ? error.message
+          : '회원 탈퇴 중 오류가 발생했습니다',
       )
     } finally {
       setIsDeleting(false)
@@ -204,7 +203,9 @@ export default function ProfilePage() {
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-purple-100 to-pink-100">
               {user?.user_metadata?.avatar_url ? (
                 <div
-                  style={{ backgroundImage: `url(${user.user_metadata.avatar_url})` }}
+                  style={{
+                    backgroundImage: `url(${user.user_metadata.avatar_url})`,
+                  }}
                   className="h-full w-full rounded-full bg-cover bg-center"
                 />
               ) : (
@@ -213,12 +214,11 @@ export default function ProfilePage() {
             </div>
             <div className="flex-1">
               <h2 className="text-lg font-semibold text-gray-900">
-                {user?.user_metadata?.full_name || user?.email?.split('@')[0]}
+                {user?.user_metadata?.full_name || user?.user_metadata?.name}
               </h2>
               <p className="text-sm text-gray-500">{user?.email}</p>
             </div>
           </div>
-
         </div>
 
         {/* 메뉴 섹션들 */}
@@ -270,7 +270,7 @@ export default function ProfilePage() {
         ))}
 
         {/* 로그아웃 버튼 */}
-        <div className="mt-6 px-5 space-y-3">
+        <div className="mt-6 space-y-3 px-5">
           <Button
             variant="ghost"
             className="w-full text-gray-600 hover:bg-gray-100 hover:text-gray-900"
@@ -279,7 +279,7 @@ export default function ProfilePage() {
             <LogOut className="mr-2 h-4 w-4" />
             로그아웃
           </Button>
-          
+
           <Button
             variant="ghost"
             className="w-full text-red-600 hover:bg-red-50 hover:text-red-700"
@@ -298,80 +298,81 @@ export default function ProfilePage() {
 
       {/* 회원 탈퇴 확인 다이얼로그 */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent className="mx-4 max-w-[360px] rounded-2xl bg-white p-0 overflow-hidden border-0 shadow-xl">
+        <DialogContent className="mx-4 max-w-[360px] overflow-hidden rounded-2xl border-0 bg-white p-0 shadow-xl">
           <div className="bg-gradient-to-r from-red-500 to-pink-500 p-6 text-white">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
-                <UserX className="w-6 h-6 text-white" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+                <UserX className="h-6 w-6 text-white" />
               </div>
               <DialogTitle className="text-xl font-semibold text-white">
                 정말 탈퇴하시겠습니까?
               </DialogTitle>
             </div>
           </div>
-          
+
           <div className="p-6">
             <DialogDescription className="text-sm text-gray-600">
               탈퇴하면 모든 데이터가 삭제되며 복구할 수 없습니다.
             </DialogDescription>
-            
-            <div className="space-y-4 mt-4">
-              <div className="bg-red-50 rounded-xl p-4">
-                <div className="font-medium text-red-900 mb-2">
+
+            <div className="mt-4 space-y-4">
+              <div className="rounded-xl bg-red-50 p-4">
+                <div className="mb-2 font-medium text-red-900">
                   회원 탈퇴 시 삭제되는 데이터:
                 </div>
                 <ul className="space-y-2 text-red-700">
                   <li className="flex items-center">
-                    <div className="w-1.5 h-1.5 rounded-full bg-red-400 mr-2 flex-shrink-0" />
+                    <div className="mr-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-red-400" />
                     모든 일기 기록
                   </li>
                   <li className="flex items-center">
-                    <div className="w-1.5 h-1.5 rounded-full bg-red-400 mr-2 flex-shrink-0" />
+                    <div className="mr-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-red-400" />
                     감정 분석 데이터
                   </li>
                   <li className="flex items-center">
-                    <div className="w-1.5 h-1.5 rounded-full bg-red-400 mr-2 flex-shrink-0" />
+                    <div className="mr-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-red-400" />
                     저장된 음성 파일
                   </li>
                   <li className="flex items-center">
-                    <div className="w-1.5 h-1.5 rounded-full bg-red-400 mr-2 flex-shrink-0" />
+                    <div className="mr-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-red-400" />
                     개인 정보
                   </li>
                 </ul>
               </div>
-              
-              <div className="flex items-start space-x-2 bg-gray-50 rounded-xl p-4">
-                <Shield className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+
+              <div className="flex items-start space-x-2 rounded-xl bg-gray-50 p-4">
+                <Shield className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-500" />
                 <div className="text-sm">
                   <div className="font-semibold text-red-600">
                     이 작업은 되돌릴 수 없습니다.
                   </div>
-                  <div className="text-gray-600 mt-1">
-                    탈퇴 후에는 모든 데이터를 복구할 수 없으니 신중하게 결정해주세요.
+                  <div className="mt-1 text-gray-600">
+                    탈퇴 후에는 모든 데이터를 복구할 수 없으니 신중하게
+                    결정해주세요.
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          
+
           <DialogFooter className="border-t border-gray-100 bg-gray-50 px-6 py-4">
-            <div className="flex flex-col-reverse sm:flex-row gap-3 w-full">
+            <div className="flex w-full flex-col-reverse gap-3 sm:flex-row">
               <Button
                 variant="outline"
                 onClick={() => setShowDeleteDialog(false)}
                 disabled={isDeleting}
-                className="w-full sm:w-auto bg-white hover:bg-gray-50 border-gray-300 text-gray-700 font-medium"
+                className="w-full border-gray-300 bg-white font-medium text-gray-700 hover:bg-gray-50 sm:w-auto"
               >
                 취소
               </Button>
               <Button
                 onClick={handleDeleteAccount}
                 disabled={isDeleting}
-                className="w-full sm:w-auto bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-medium shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-gradient-to-r from-red-500 to-pink-500 font-medium text-white shadow-md hover:from-red-600 hover:to-pink-600 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
               >
                 {isDeleting ? (
                   <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                     <span>처리 중...</span>
                   </div>
                 ) : (

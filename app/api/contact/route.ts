@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/client'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 import nodemailer from 'nodemailer'
 
 const CONTACT_TYPES = {
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 사용자 정보 가져오기
-    const supabase = createClient()
+    const supabase = await createServerSupabaseClient()
     const {
       data: { user },
     } = await supabase.auth.getUser()
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
                     <span class="label">발신자:</span> ${email}
                 </div>
                 <div class="info-item">
-                    <span class="label">사용자 ID:</span> ${user?.id || '비로그인'}
+                    <span class="label">사용자 ID:</span> ${user?.email || '비로그인'}
                 </div>
                 <div class="info-item">
                     <span class="label">제목:</span> ${subject}
@@ -91,13 +91,7 @@ export async function POST(request: NextRequest) {
 
     try {
       // 환경 변수 확인
-      console.log('SMTP Config:', {
-        host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT,
-        user: process.env.SMTP_USER,
-        passExists: !!process.env.SMTP_PASS,
-        to: process.env.EMAIL_TO,
-      })
+      // SMTP Config: host, port, user, passExists, to
 
       // Gmail SMTP 설정
       const transporter = nodemailer.createTransport({
@@ -115,10 +109,10 @@ export async function POST(request: NextRequest) {
 
       // 연결 테스트
       await transporter.verify()
-      console.log('SMTP connection verified')
+      // SMTP connection verified
 
       // 이메일 전송
-      const info = await transporter.sendMail({
+      await transporter.sendMail({
         from: `"울림" <${process.env.SMTP_USER}>`,
         to: process.env.EMAIL_TO || 'ullim0125@gmail.com',
         replyTo: email,
@@ -126,10 +120,9 @@ export async function POST(request: NextRequest) {
         html: emailHtml,
       })
 
-      console.log('Email sent successfully:', info.messageId)
-      console.log('Email response:', info)
+      // Email sent successfully
     } catch (emailError) {
-      console.error('Failed to send email:', emailError)
+      // Failed to send email: emailError
       // 실제 에러를 클라이언트에 전달
       return NextResponse.json(
         {
@@ -153,7 +146,7 @@ export async function POST(request: NextRequest) {
       })
 
       if (dbError) {
-        console.error('Failed to save contact to database:', dbError)
+        // Failed to save contact to database: dbError
         // DB 저장 실패해도 이메일은 전송되었으므로 성공 응답
       }
     }
@@ -162,8 +155,8 @@ export async function POST(request: NextRequest) {
       success: true,
       message: '문의가 성공적으로 전송되었습니다',
     })
-  } catch (error) {
-    console.error('Contact API error:', error)
+  } catch {
+    // Contact API error: error
     return NextResponse.json(
       { error: '문의 전송 중 오류가 발생했습니다' },
       { status: 500 },

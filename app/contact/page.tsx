@@ -102,8 +102,8 @@ export default function ContactPage() {
 
       toast.success('문의가 성공적으로 전송되었습니다')
       router.push('/profile')
-    } catch (error) {
-      console.error('Contact error:', error)
+    } catch {
+      // Contact error: error
       toast.error('문의 전송 중 오류가 발생했습니다')
     } finally {
       setIsSubmitting(false)

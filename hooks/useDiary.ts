@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { DiaryEntry } from '@/types'
+import { DiaryEntryWithRelations } from '@/types'
 import { SearchFilterValues } from '@/components/diary/search-filter'
 
 export function useDiary() {
-  const [diaries, setDiaries] = useState<DiaryEntry[]>([])
+  const [diaries, setDiaries] = useState<DiaryEntryWithRelations[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const supabase = createClient()

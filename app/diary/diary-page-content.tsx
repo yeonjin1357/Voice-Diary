@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { MobileLayout } from '@/components/layout/mobile-layout'
 import { DiaryCard } from '@/components/diary/diary-card'
-import { DiaryEntry } from '@/types'
+import { DiaryEntryWithRelations } from '@/types'
 import { Calendar } from '@/components/diary/calendar'
 import { useDiary } from '@/hooks/useDiary'
 import {
@@ -35,7 +35,7 @@ export default function DiaryPageContent() {
   })
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [showDiarySelection, setShowDiarySelection] = useState(false)
-  const [selectedDateDiaries, setSelectedDateDiaries] = useState<DiaryEntry[]>([])
+  const [selectedDateDiaries, setSelectedDateDiaries] = useState<DiaryEntryWithRelations[]>([])
   const [, setFilterValues] = useState<SearchFilterValues>({
     keyword: '',
     emotion: null,
@@ -108,7 +108,7 @@ export default function DiaryPageContent() {
     
     if (hasFilters) {
       // 필터링된 결과 가져오기
-      await fetchDiaries(year, month, filters)
+      await fetchDiaries(year, month)
     } else {
       // 필터가 없으면 현재 월의 모든 일기 표시
       await fetchDiaries(year, month)
@@ -275,7 +275,7 @@ export default function DiaryPageContent() {
                       {index + 1}번째 일기
                     </p>
                     <div className="flex gap-1">
-                      {diary.emotions?.slice(0, 2).map((emotion, idx) => {
+                      {(diary as DiaryEntryWithRelations).emotions?.slice(0, 2).map((emotion, idx) => {
                         const emojiMap: Record<string, string> = {
                           '기쁨': '😊',
                           '슬픔': '😢',

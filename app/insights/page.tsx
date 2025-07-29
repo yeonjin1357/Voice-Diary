@@ -90,9 +90,9 @@ export default function InsightsPage() {
         const data = await keywordsResponse.json()
         setKeywordData(data.keywords)
       }
-    } catch (error) {
+    } catch {
       toast.error('인사이트 데이터를 불러오는데 실패했습니다.')
-      console.error('Error fetching insights:', error)
+      // Error fetching insights: error
     } finally {
       setIsLoading(false)
     }

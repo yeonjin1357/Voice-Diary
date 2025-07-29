@@ -43,7 +43,7 @@ export function useRecorder(): UseRecorderReturn {
   }, [isRecording, isPaused])
 
   const startTimer = useCallback(() => {
-    console.log('Starting timer...')
+    // Starting timer...
     if (timerIntervalRef.current) {
       clearInterval(timerIntervalRef.current)
     }
@@ -56,7 +56,7 @@ export function useRecorder(): UseRecorderReturn {
       
       const elapsed = Date.now() - startTimeRef.current
       const seconds = Math.floor(elapsed / 1000)
-      console.log('Timer update:', seconds)
+      // Timer update: seconds
       setRecordingTime(seconds)
     }, 100)
   }, [])
@@ -91,7 +91,7 @@ export function useRecorder(): UseRecorderReturn {
           sampleSize: 16
         } 
       }).catch((err) => {
-        console.error('getUserMedia error:', err)
+        // getUserMedia error: err
         if (err.name === 'NotAllowedError') {
           throw new Error('마이크 사용 권한이 거부되었습니다. 브라우저 설정에서 마이크 권한을 허용해주세요.')
         } else if (err.name === 'NotFoundError') {
@@ -137,7 +137,7 @@ export function useRecorder(): UseRecorderReturn {
         }
       }
       
-      console.log('Using MIME type:', mimeType)
+      // Using MIME type: mimeType
       
       mediaRecorderRef.current = new MediaRecorder(stream, { 
         mimeType,
@@ -152,18 +152,18 @@ export function useRecorder(): UseRecorderReturn {
       }
       
       mediaRecorderRef.current.onerror = (event) => {
-        console.error('MediaRecorder error:', event)
+        // MediaRecorder error: event
       }
       
       mediaRecorderRef.current.start(1000) // Collect data every 1000ms for better metadata
       setIsRecording(true)
       setIsPaused(false)
       
-      console.log('Recording started, calling startTimer...')
+      // Recording started, calling startTimer...
       startTimer()
       updateAudioLevel()
     } catch (error) {
-      console.error('Error starting recording:', error)
+      // Error starting recording: error
       throw error
     }
   }

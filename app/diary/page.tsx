@@ -15,7 +15,7 @@ import {
   X,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import { cn } from '@/lib/utils'
@@ -25,10 +25,14 @@ type ViewMode = 'list' | 'calendar'
 
 export default function DiaryPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { diaries, loading, error, fetchDiaries } = useDiary()
 
   const [currentDate, setCurrentDate] = useState(new Date())
-  const [viewMode, setViewMode] = useState<ViewMode>('list')
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const view = searchParams.get('view')
+    return view === 'calendar' ? 'calendar' : 'list'
+  })
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [showDiarySelection, setShowDiarySelection] = useState(false)
   const [selectedDateDiaries, setSelectedDateDiaries] = useState<DiaryEntry[]>([])

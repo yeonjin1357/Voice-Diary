@@ -5,13 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Home } from 'lucide-react'
 import Link from 'next/link'
@@ -215,37 +208,42 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-neutral-50 px-4 dark:bg-neutral-900">
+    <div className="relative flex min-h-screen flex-col bg-white dark:bg-neutral-900">
       {/* 홈 버튼 */}
-      <Link href="/" className="absolute top-4 left-4">
+      <Link href="/" className="absolute top-4 left-4 z-10">
         <Button variant="ghost" size="icon" className="rounded-full">
           <Home className="h-5 w-5" />
         </Button>
       </Link>
 
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-4 text-center">
-          <div className="flex justify-center">
-            <Image
-              src="/logo.svg"
-              alt="울림 로고"
-              width={60}
-              height={60}
-              priority
-              className="dark:invert"
-            />
-          </div>
-          <CardDescription>
-            {isSignUp
-              ? '새로운 계정을 만들어주세요'
-              : '로그인하여 일기를 작성해보세요'}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      {/* 상단 로고 및 타이틀 섹션 */}
+      <div className="mt-20 mb-12 text-center px-8">
+        <div className="flex justify-center mb-6">
+          <Image
+            src="/logo.svg"
+            alt="울림 로고"
+            width={80}
+            height={80}
+            priority
+            className="dark:invert"
+          />
+        </div>
+        <h1 className="text-2xl font-bold text-neutral-900 dark:text-white mb-2">
+          울림
+        </h1>
+        <p className="text-base text-neutral-600 dark:text-neutral-400">
+          {isSignUp
+            ? '새로운 계정을 만들어주세요'
+            : '로그인하여 일기를 작성해보세요'}
+        </p>
+      </div>
+
+      {/* 메인 컨텐츠 - 스크롤 가능 영역 */}
+      <div className="flex-1 px-6 pb-8 overflow-y-auto">
           <form onSubmit={handleSubmit} className="space-y-4">
             {isSignUp && (
-              <div className="space-y-2">
-                <Label htmlFor="name">이름</Label>
+              <div className="space-y-3">
+                <Label htmlFor="name" className="text-base font-medium">이름</Label>
                 <Input
                   id="name"
                   type="text"
@@ -254,13 +252,14 @@ export default function LoginForm() {
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setName(e.target.value)
                   }
+                  className="h-12 text-base"
                   required
                 />
               </div>
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="email">이메일</Label>
+            <div className="space-y-3">
+              <Label htmlFor="email" className="text-base font-medium">이메일</Label>
               <Input
                 ref={emailRef}
                 id="email"
@@ -271,15 +270,15 @@ export default function LoginForm() {
                   setEmail(e.target.value)
                   setEmailError(false)
                 }}
-                className={
+                className={`h-12 text-base ${
                   emailError ? 'border-red-500 focus:ring-red-500' : ''
-                }
+                }`}
                 required
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">비밀번호</Label>
+            <div className="space-y-3">
+              <Label htmlFor="password" className="text-base font-medium">비밀번호</Label>
               <Input
                 ref={passwordRef}
                 id="password"
@@ -290,21 +289,21 @@ export default function LoginForm() {
                   setPassword(e.target.value)
                   setPasswordError(false)
                 }}
-                className={
+                className={`h-12 text-base ${
                   passwordError ? 'border-red-500 focus:ring-red-500' : ''
-                }
+                }`}
                 required
               />
               {isSignUp && (
-                <p className="text-xs text-neutral-500">
+                <p className="text-sm text-neutral-500">
                   최소 6자 이상 입력해주세요
                 </p>
               )}
             </div>
 
             {isSignUp && (
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">비밀번호 확인</Label>
+              <div className="space-y-3">
+                <Label htmlFor="confirmPassword" className="text-base font-medium">비밀번호 확인</Label>
                 <Input
                   ref={confirmPasswordRef}
                   id="confirmPassword"
@@ -315,11 +314,11 @@ export default function LoginForm() {
                     setConfirmPassword(e.target.value)
                     setConfirmPasswordError(false)
                   }}
-                  className={
+                  className={`h-12 text-base ${
                     confirmPasswordError
                       ? 'border-red-500 focus:ring-red-500'
                       : ''
-                  }
+                  }`}
                   required
                 />
               </div>
@@ -327,7 +326,7 @@ export default function LoginForm() {
 
             <Button
               type="submit"
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700"
+              className="w-full h-14 text-base font-medium bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 mt-6"
               disabled={isLoading || isCheckingEmail}
             >
               {isLoading ? '처리 중...' : isSignUp ? '회원가입' : '로그인'}
@@ -335,23 +334,23 @@ export default function LoginForm() {
           </form>
 
           {/* 소셜 로그인 구분선 */}
-          <div className="relative my-6">
+          <div className="relative my-8">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-neutral-200 dark:border-neutral-700" />
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="text-muted-foreground bg-neutral-50 px-2">
+            <div className="relative flex justify-center text-sm uppercase">
+              <span className="text-muted-foreground bg-white dark:bg-neutral-900 px-3">
                 또는
               </span>
             </div>
           </div>
 
           {/* 소셜 로그인 버튼들 */}
-          <div className="space-y-3">
+          <div className="space-y-4">
             <Button
               type="button"
               variant="outline"
-              className="relative w-full"
+              className="relative w-full h-14 text-base"
               onClick={handleGoogleLogin}
               disabled={isLoading}
             >
@@ -379,7 +378,7 @@ export default function LoginForm() {
             <Button
               type="button"
               variant="outline"
-              className="relative w-full border-[#FEE500] bg-[#FEE500] text-black hover:border-[#FEE500]/90 hover:bg-[#FEE500]/90"
+              className="relative w-full h-14 text-base border-[#FEE500] bg-[#FEE500] text-black hover:border-[#FEE500]/90 hover:bg-[#FEE500]/90"
               onClick={handleKakaoLogin}
               disabled={isLoading}
             >
@@ -394,7 +393,7 @@ export default function LoginForm() {
             </Button>
           </div>
 
-          <div className="mt-4 text-center text-sm">
+          <div className="mt-8 text-center text-base">
             {isSignUp ? (
               <>
                 이미 계정이 있으신가요?{' '}
@@ -428,8 +427,7 @@ export default function LoginForm() {
               </>
             )}
           </div>
-        </CardContent>
-      </Card>
+      </div>
     </div>
   )
 }

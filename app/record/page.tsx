@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
+import { uploadAudioFile } from '@/lib/supabase/storage'
 import { Textarea } from '@/components/ui/textarea'
 import {
   Dialog,
@@ -144,6 +145,20 @@ export default function RecordPage() {
     setIsProcessing(true)
     setLoadingMessage('감정을 분석하고 일기를 저장하고 있습니다')
     try {
+      // 1. 음성 파일 업로드
+      const user = await supabase.auth.getUser()
+      if (!user.data.user) {
+        throw new Error('로그인이 필요합니다')
+      }
+
+      let audioUrl: string | null = null
+      if (audioBlob) {
+        const today = new Date().toISOString().split('T')[0]
+        audioUrl = await uploadAudioFile(user.data.user.id, audioBlob, today)
+        if (!audioUrl) {
+          console.warn('음성 파일 업로드 실패, 계속 진행합니다')
+        }
+      }
 
       // 2. GPT-4로 감정 분석
       const analysisResponse = await fetch('/api/analyze', {
@@ -170,8 +185,9 @@ export default function RecordPage() {
         },
         body: JSON.stringify({
           date: today,
-          audioUrl: null, // TODO: 음성 파일 업로드 구현
-          transcript,
+          audioUrl,
+          audioDuration: recordingTime, // 녹음 시간 추가
+          transcript: finalTranscript,
           summary: analysis.summary,
           emotions: analysis.emotions,
           keywords: analysis.keywords,

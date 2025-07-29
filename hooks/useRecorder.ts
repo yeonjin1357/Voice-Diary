@@ -155,7 +155,7 @@ export function useRecorder(): UseRecorderReturn {
         console.error('MediaRecorder error:', event)
       }
       
-      mediaRecorderRef.current.start(100) // Collect data every 100ms
+      mediaRecorderRef.current.start(1000) // Collect data every 1000ms for better metadata
       setIsRecording(true)
       setIsPaused(false)
       

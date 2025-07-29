@@ -3,6 +3,7 @@ export interface DiaryEntry {
   userId: string;
   date: Date;
   audioUrl?: string;
+  audioDuration?: number;
   transcript: string;
   emotions: Emotion[];
   keywords: string[];

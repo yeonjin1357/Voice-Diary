@@ -38,7 +38,6 @@ export default function RecordPage() {
 
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
-  const [transcript, setTranscript] = useState<string>('')
   const [editedTranscript, setEditedTranscript] = useState<string>('')
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState('')
@@ -126,7 +125,6 @@ export default function RecordPage() {
       }
 
       const { transcript: text } = await transcriptResponse.json()
-      setTranscript(text)
       setEditedTranscript(text)
       setShowEditDialog(true)
     } catch (error) {
@@ -400,7 +398,6 @@ export default function RecordPage() {
                 variant="outline"
                 onClick={() => {
                   setShowEditDialog(false)
-                  setTranscript('')
                   setEditedTranscript('')
                 }}
                 className="flex-1 rounded-xl border-gray-200 bg-white py-6 text-gray-700 hover:bg-gray-50"

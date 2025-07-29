@@ -277,29 +277,16 @@ export function AudioPlayer({ audioUrl, fileName = 'recording.webm', initialDura
             {[...Array(20)].map((_, i) => (
               <div
                 key={i}
-                className="h-8 w-1 rounded-full bg-gradient-to-t from-purple-400 to-pink-400 opacity-70"
+                className="w-1 rounded-full bg-gradient-to-t from-purple-400 to-pink-400 opacity-70 animate-pulse"
                 style={{
-                  animation: `wave ${1 + i * 0.1}s ease-in-out infinite`,
-                  height: `${Math.random() * 24 + 8}px`
+                  height: `${Math.random() * 24 + 8}px`,
+                  animationDelay: `${i * 0.1}s`
                 }}
               />
             ))}
           </div>
         )}
       </div>
-
-      <style jsx>{`
-        @keyframes wave {
-          0%, 100% {
-            transform: scaleY(0.5);
-            opacity: 0.5;
-          }
-          50% {
-            transform: scaleY(1);
-            opacity: 1;
-          }
-        }
-      `}</style>
     </div>
   )
 }

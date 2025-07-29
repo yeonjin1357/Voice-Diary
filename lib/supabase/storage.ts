@@ -8,7 +8,7 @@ export async function uploadAudioFile(userId: string, file: Blob, date: string):
   const fileName = `${userId}/${date}-${timestamp}.webm`
   
   // Storage에 파일 업로드
-  const { data, error } = await supabase.storage
+  const { error } = await supabase.storage
     .from('voice-recordings')
     .upload(fileName, file, {
       contentType: 'audio/webm',

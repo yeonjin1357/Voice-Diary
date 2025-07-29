@@ -120,14 +120,6 @@ export default function ProfilePage() {
   const header = (
     <div className="flex items-center justify-between bg-white px-5 py-4">
       <h1 className="text-xl font-bold text-gray-900">마이페이지</h1>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => router.push('/settings')}
-        className="text-gray-600"
-      >
-        <Settings className="h-5 w-5" />
-      </Button>
     </div>
   )
 
@@ -233,7 +225,7 @@ export default function ProfilePage() {
               {section.items.map((item, itemIndex) => (
                 <button
                   key={itemIndex}
-                  className={`flex w-full items-center justify-between px-5 py-4 ${
+                  className={`flex w-full items-center justify-between px-5 py-4 min-h-[72px] ${
                     item.disabled
                       ? 'opacity-50'
                       : 'hover:bg-gray-50 active:bg-gray-100'
@@ -273,19 +265,19 @@ export default function ProfilePage() {
         <div className="mt-6 space-y-3 px-5">
           <Button
             variant="ghost"
-            className="w-full text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+            className="w-full h-12 text-base text-gray-600 hover:bg-gray-100 hover:text-gray-900"
             onClick={handleLogout}
           >
-            <LogOut className="mr-2 h-4 w-4" />
+            <LogOut className="mr-2 h-5 w-5" />
             로그아웃
           </Button>
 
           <Button
             variant="ghost"
-            className="w-full text-red-600 hover:bg-red-50 hover:text-red-700"
+            className="w-full h-12 text-base text-red-600 hover:bg-red-50 hover:text-red-700"
             onClick={() => setShowDeleteDialog(true)}
           >
-            <UserX className="mr-2 h-4 w-4" />
+            <UserX className="mr-2 h-5 w-5" />
             회원 탈퇴
           </Button>
         </div>
@@ -298,7 +290,7 @@ export default function ProfilePage() {
 
       {/* 회원 탈퇴 확인 다이얼로그 */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent className="mx-4 max-w-[360px] overflow-hidden rounded-2xl border-0 bg-white p-0 shadow-xl">
+        <DialogContent className="mx-4 max-w-[360px] overflow-hidden rounded-2xl border-0 bg-white p-0 shadow-xl sm:mx-auto">
           <div className="bg-gradient-to-r from-red-500 to-pink-500 p-6 text-white">
             <div className="flex items-center space-x-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">

@@ -7,7 +7,6 @@ import {
   User,
   Calendar,
   FileText,
-  Settings,
   LogOut,
   ChevronRight,
   Bell,
@@ -225,7 +224,7 @@ export default function ProfilePage() {
               {section.items.map((item, itemIndex) => (
                 <button
                   key={itemIndex}
-                  className={`flex w-full items-center justify-between px-5 py-4 min-h-[72px] ${
+                  className={`flex min-h-[72px] w-full items-center justify-between px-5 py-4 ${
                     item.disabled
                       ? 'opacity-50'
                       : 'hover:bg-gray-50 active:bg-gray-100'
@@ -265,7 +264,7 @@ export default function ProfilePage() {
         <div className="mt-6 space-y-3 px-5">
           <Button
             variant="ghost"
-            className="w-full h-12 text-base text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+            className="h-12 w-full text-base text-gray-600 hover:bg-gray-100 hover:text-gray-900"
             onClick={handleLogout}
           >
             <LogOut className="mr-2 h-5 w-5" />
@@ -274,7 +273,7 @@ export default function ProfilePage() {
 
           <Button
             variant="ghost"
-            className="w-full h-12 text-base text-red-600 hover:bg-red-50 hover:text-red-700"
+            className="h-12 w-full text-base text-red-600 hover:bg-red-50 hover:text-red-700"
             onClick={() => setShowDeleteDialog(true)}
           >
             <UserX className="mr-2 h-5 w-5" />

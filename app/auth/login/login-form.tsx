@@ -15,6 +15,7 @@ import {
 import { Label } from '@/components/ui/label'
 import { Home } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { toast } from 'sonner'
 
 export default function LoginForm() {
@@ -98,9 +99,10 @@ export default function LoginForm() {
   const checkEmailExists = async (email: string): Promise<boolean> => {
     setIsCheckingEmail(true)
     try {
-      const { data } = await supabase
-        .rpc('check_email_exists', { email_input: email })
-      
+      const { data } = await supabase.rpc('check_email_exists', {
+        email_input: email,
+      })
+
       return data === true
     } catch {
       // 처리하지 않음 - false 반환
@@ -168,21 +170,22 @@ export default function LoginForm() {
         if (error) throw error
 
         toast.success('로그인되었습니다!')
-        
+
         // 로그인 성공 후 바로 리다이렉트
         router.push(redirectedFrom)
         router.refresh()
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : '오류가 발생했습니다.'
-      
+      const errorMessage =
+        err instanceof Error ? err.message : '오류가 발생했습니다.'
+
       // Supabase 영문 에러 메시지를 한글로 변환 및 적절한 필드에 포커스
       if (errorMessage.includes('Invalid login credentials')) {
         // 로그인 시 잘못된 인증 정보
         if (!isSignUp) {
           // 먼저 이메일이 존재하는지 확인
           const emailExists = await checkEmailExists(email)
-          
+
           if (!emailExists) {
             toast.error('등록되지 않은 이메일입니다.')
             setEmailError(true)
@@ -221,10 +224,17 @@ export default function LoginForm() {
       </Link>
 
       <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-2xl text-transparent">
-            울림
-          </CardTitle>
+        <CardHeader className="space-y-4 text-center">
+          <div className="flex justify-center">
+            <Image
+              src="/logo.svg"
+              alt="울림 로고"
+              width={60}
+              height={60}
+              priority
+              className="dark:invert"
+            />
+          </div>
           <CardDescription>
             {isSignUp
               ? '새로운 계정을 만들어주세요'
@@ -261,7 +271,9 @@ export default function LoginForm() {
                   setEmail(e.target.value)
                   setEmailError(false)
                 }}
-                className={emailError ? 'border-red-500 focus:ring-red-500' : ''}
+                className={
+                  emailError ? 'border-red-500 focus:ring-red-500' : ''
+                }
                 required
               />
             </div>
@@ -278,7 +290,9 @@ export default function LoginForm() {
                   setPassword(e.target.value)
                   setPasswordError(false)
                 }}
-                className={passwordError ? 'border-red-500 focus:ring-red-500' : ''}
+                className={
+                  passwordError ? 'border-red-500 focus:ring-red-500' : ''
+                }
                 required
               />
               {isSignUp && (
@@ -301,15 +315,19 @@ export default function LoginForm() {
                     setConfirmPassword(e.target.value)
                     setConfirmPasswordError(false)
                   }}
-                  className={confirmPasswordError ? 'border-red-500 focus:ring-red-500' : ''}
+                  className={
+                    confirmPasswordError
+                      ? 'border-red-500 focus:ring-red-500'
+                      : ''
+                  }
                   required
                 />
               </div>
             )}
 
-            <Button 
-              type="submit" 
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white" 
+            <Button
+              type="submit"
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700"
               disabled={isLoading || isCheckingEmail}
             >
               {isLoading ? '처리 중...' : isSignUp ? '회원가입' : '로그인'}
@@ -361,7 +379,7 @@ export default function LoginForm() {
             <Button
               type="button"
               variant="outline"
-              className="relative w-full bg-[#FEE500] hover:bg-[#FEE500]/90 text-black border-[#FEE500] hover:border-[#FEE500]/90"
+              className="relative w-full border-[#FEE500] bg-[#FEE500] text-black hover:border-[#FEE500]/90 hover:bg-[#FEE500]/90"
               onClick={handleKakaoLogin}
               disabled={isLoading}
             >
@@ -388,7 +406,7 @@ export default function LoginForm() {
                     setConfirmPassword('')
                     clearErrors()
                   }}
-                  className="font-medium text-purple-600 hover:text-purple-700 hover:underline cursor-pointer"
+                  className="cursor-pointer font-medium text-purple-600 hover:text-purple-700 hover:underline"
                 >
                   로그인
                 </button>
@@ -403,7 +421,7 @@ export default function LoginForm() {
                     setPassword('')
                     clearErrors()
                   }}
-                  className="font-medium text-purple-600 hover:text-purple-700 hover:underline cursor-pointer"
+                  className="cursor-pointer font-medium text-purple-600 hover:text-purple-700 hover:underline"
                 >
                   회원가입
                 </button>

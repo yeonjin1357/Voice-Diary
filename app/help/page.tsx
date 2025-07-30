@@ -146,34 +146,6 @@ const faqData: FAQCategory[] = [
     ],
   },
   {
-    id: 'app',
-    title: '앱 사용',
-    icon: Smartphone,
-    items: [
-      {
-        id: 'app-1',
-        question: '모바일 앱은 어디서 다운로드하나요?',
-        answer:
-          '울림은 PWA(Progressive Web App)로 제공됩니다. 브라우저에서 "홈 화면에 추가" 기능을 사용하면 일반 앱처럼 사용할 수 있습니다.',
-        category: 'app',
-      },
-      {
-        id: 'app-2',
-        question: '오프라인에서도 사용할 수 있나요?',
-        answer:
-          '기본적인 일기 보기와 작성은 오프라인에서도 가능합니다. 인터넷에 연결되면 자동으로 동기화됩니다. 단, 음성 인식과 감정 분석은 온라인 상태에서만 가능합니다.',
-        category: 'app',
-      },
-      {
-        id: 'app-3',
-        question: '다크 모드를 지원하나요?',
-        answer:
-          '네, 시스템 설정에 따라 자동으로 다크 모드가 적용됩니다. 추후 앱 내에서 직접 테마를 선택할 수 있는 기능도 추가될 예정입니다.',
-        category: 'app',
-      },
-    ],
-  },
-  {
     id: 'notification',
     title: '알림 설정',
     icon: Bell,
@@ -288,7 +260,7 @@ export default function HelpPage() {
 
         {/* 선택된 카테고리 표시 */}
         {selectedCategory && (
-          <div className="mb-4 px-5">
+          <div className="my-4 px-5">
             <Button
               variant="ghost"
               size="sm"

@@ -211,7 +211,7 @@ Claude, implement push notifications for daily diary reminders
 ### 음성 녹음 구현
 
 - MediaRecorder API 사용 (브라우저 호환성 체크)
-- 최대 5분 녹음 제한
+- 최대 3분 녹음 제한
 - 녹음 중 실시간 오디오 레벨 표시
 - 녹음 파일 포맷: webm/opus (크기 최적화)
 

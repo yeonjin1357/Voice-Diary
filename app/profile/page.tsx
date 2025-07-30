@@ -151,7 +151,6 @@ export default function ProfilePage() {
           subtitle: '일기 리마인더, 주간 리포트',
           onClick: () => router.push('/settings/notifications'),
           showArrow: true,
-          disabled: true,
         },
         {
           icon: Shield,
@@ -159,7 +158,6 @@ export default function ProfilePage() {
           subtitle: '비밀번호, 백업 설정',
           onClick: () => router.push('/settings/privacy'),
           showArrow: true,
-          disabled: true,
         },
       ],
     },
@@ -172,7 +170,6 @@ export default function ProfilePage() {
           subtitle: '자주 묻는 질문',
           onClick: () => router.push('/help'),
           showArrow: true,
-          disabled: true,
         },
         {
           icon: MessageCircle,

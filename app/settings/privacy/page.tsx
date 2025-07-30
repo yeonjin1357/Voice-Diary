@@ -54,12 +54,36 @@ export default function PrivacySettingsPage() {
   const handleExportData = async () => {
     setIsExporting(true)
     try {
-      // 실제로는 API 호출하여 데이터 내보내기
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      const response = await fetch('/api/user/export')
+      
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || '데이터 내보내기에 실패했습니다')
+      }
+
+      // Blob으로 변환
+      const blob = await response.blob()
+      
+      // 다운로드 링크 생성
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = response.headers.get('content-disposition')?.split('filename=')[1]?.replace(/"/g, '') || 'voice_diary_export.zip'
+      document.body.appendChild(a)
+      a.click()
+      
+      // 정리
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+      
       toast.success('데이터 내보내기가 완료되었습니다')
       setShowExportDialog(false)
-    } catch {
-      toast.error('데이터 내보내기에 실패했습니다')
+    } catch (error) {
+      toast.error(
+        error instanceof Error 
+          ? error.message 
+          : '데이터 내보내기에 실패했습니다'
+      )
     } finally {
       setIsExporting(false)
     }
@@ -79,16 +103,35 @@ export default function PrivacySettingsPage() {
 
     setIsChangingPassword(true)
     try {
-      // 실제로는 API 호출하여 비밀번호 변경
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      toast.success('비밀번호가 변경되었습니다')
+      const response = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          currentPassword,
+          newPassword,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || '비밀번호 변경에 실패했습니다')
+      }
+
+      toast.success(data.message || '비밀번호가 변경되었습니다')
       setShowPasswordDialog(false)
       // 폼 초기화
       setCurrentPassword('')
       setNewPassword('')
       setConfirmPassword('')
-    } catch {
-      toast.error('비밀번호 변경에 실패했습니다')
+    } catch (error) {
+      toast.error(
+        error instanceof Error 
+          ? error.message 
+          : '비밀번호 변경에 실패했습니다'
+      )
     } finally {
       setIsChangingPassword(false)
     }
@@ -106,6 +149,11 @@ export default function PrivacySettingsPage() {
           type: 'action',
           action: () => setShowPasswordDialog(true),
         },
+      ],
+    },
+    {
+      title: '데이터 관리',
+      items: [
         {
           id: 'export',
           icon: Download,

@@ -10,7 +10,6 @@ import {
   FileText,
   Shield,
   Bell,
-  Smartphone,
   HelpCircle,
   X,
   LucideIcon,

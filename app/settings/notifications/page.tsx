@@ -103,7 +103,6 @@ export default function NotificationSettingsPage() {
   }
   
   const [notifications, setNotifications] = useState<NotificationItem[]>(getDefaultNotifications())
-  const [isClient, setIsClient] = useState(false)
 
   const [reminderFrequency, setReminderFrequency] = useState('daily')
   const [reminderTime, setReminderTime] = useState('21:00')
@@ -113,7 +112,6 @@ export default function NotificationSettingsPage() {
 
   // 클라이언트 사이드에서만 실행
   useEffect(() => {
-    setIsClient(true)
     const saved = localStorage.getItem('notificationSettings')
     if (saved) {
       try {
@@ -174,7 +172,7 @@ export default function NotificationSettingsPage() {
           ? {
               ...item,
               settings: {
-                frequency: reminderFrequency,
+                frequency: reminderFrequency as 'daily' | 'weekly' | 'custom',
                 time: reminderTime,
                 days: selectedDays,
               },

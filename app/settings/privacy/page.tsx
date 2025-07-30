@@ -58,7 +58,7 @@ export default function PrivacySettingsPage() {
       await new Promise((resolve) => setTimeout(resolve, 2000))
       toast.success('데이터 내보내기가 완료되었습니다')
       setShowExportDialog(false)
-    } catch (error) {
+    } catch {
       toast.error('데이터 내보내기에 실패했습니다')
     } finally {
       setIsExporting(false)
@@ -87,7 +87,7 @@ export default function PrivacySettingsPage() {
       setCurrentPassword('')
       setNewPassword('')
       setConfirmPassword('')
-    } catch (error) {
+    } catch {
       toast.error('비밀번호 변경에 실패했습니다')
     } finally {
       setIsChangingPassword(false)

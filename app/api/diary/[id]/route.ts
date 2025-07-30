@@ -52,6 +52,7 @@ export async function GET(
         score: e.score,
       })),
       keywords: data.keywords.map((k: { keyword: string }) => k.keyword),
+      images: data.images || [],
       createdAt: new Date(data.created_at),
       updatedAt: new Date(data.updated_at),
     };
@@ -82,7 +83,7 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const { summary, transcript, keywords } = body;
+    const { summary, transcript, keywords, images } = body;
 
     // 일기 소유권 확인
     const { data: existingDiary, error: checkError } = await supabase
@@ -102,6 +103,7 @@ export async function PATCH(
       .update({
         summary,
         transcript,
+        images: images || [],
         updated_at: new Date().toISOString(),
       })
       .eq('id', params.id);
@@ -163,6 +165,7 @@ export async function PATCH(
         score: e.score,
       })),
       keywords: updatedDiary.keywords.map((k: { keyword: string }) => k.keyword),
+      images: updatedDiary.images || [],
       createdAt: new Date(updatedDiary.created_at),
       updatedAt: new Date(updatedDiary.updated_at),
     };

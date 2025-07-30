@@ -7,6 +7,7 @@ import { DiaryEntryWithRelations, Keyword } from '@/types'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { AudioPlayer } from '@/components/audio-player'
+import { ImageUpload } from '@/components/diary/image-upload'
 import {
   ArrowLeft,
   Calendar,
@@ -17,6 +18,7 @@ import {
   Plus,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import Image from 'next/image'
 
 interface DiaryDetailPageProps {
   params: Promise<{ id: string }>
@@ -55,6 +57,7 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
   const [editedKeywords, setEditedKeywords] = useState<string[]>([])
   const [isSaving, setIsSaving] = useState(false)
   const [newKeyword, setNewKeyword] = useState('')
+  const [editedImages, setEditedImages] = useState<string[]>([])
 
   useEffect(() => {
     params.then((p) => {
@@ -86,6 +89,7 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
       setEditedSummary(diary.summary || '')
       setEditedTranscript(diary.transcript || '')
       setEditedKeywords(diary.keywords?.map((k: Keyword) => k.keyword) || [])
+      setEditedImages(diary.images || [])
     } catch (err) {
       setError(err instanceof Error ? err.message : '오류가 발생했습니다.')
     } finally {
@@ -125,6 +129,7 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
       setEditedSummary(diary.summary || '')
       setEditedTranscript(diary.transcript || '')
       setEditedKeywords(diary.keywords?.map((k: Keyword) => k.keyword) || [])
+      setEditedImages(diary.images || [])
     }
   }
 
@@ -142,6 +147,7 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
           summary: editedSummary,
           transcript: editedTranscript,
           keywords: editedKeywords,
+          images: editedImages,
         }),
       })
 
@@ -345,6 +351,41 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
             </p>
           )}
         </div>
+
+        {/* 이미지 */}
+        {((diary.images && diary.images.length > 0) || isEditing) && (
+          <div className="rounded-2xl border border-gray-100 bg-white p-5">
+            <h2 className="mb-3 font-medium text-gray-900">사진</h2>
+            {isEditing ? (
+              <ImageUpload
+                images={editedImages}
+                onImagesChange={setEditedImages}
+                maxImages={5}
+              />
+            ) : (
+              <div className="grid grid-cols-3 gap-2">
+                {diary.images?.map((imageUrl, index) => (
+                  <div
+                    key={imageUrl}
+                    className="relative aspect-square overflow-hidden rounded-lg bg-gray-100"
+                  >
+                    <Image
+                      src={imageUrl}
+                      alt={`일기 이미지 ${index + 1}`}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 33vw"
+                      onClick={() => {
+                        // 이미지 클릭 시 전체화면 보기 (추후 구현)
+                        window.open(imageUrl, '_blank')
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* 키워드 */}
         {(diary.keywords.length > 0 || isEditing) && (

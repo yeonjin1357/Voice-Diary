@@ -17,6 +17,7 @@ export interface DiaryEntry {
   audioDuration?: number
   transcript?: string
   summary?: string
+  images?: string[]
   createdAt: string
   updatedAt: string
 }

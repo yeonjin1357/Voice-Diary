@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, X, ChevronDown, Minus } from 'lucide-react'
+import { Plus, X, Minus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Emotion } from '@/types'
 import {

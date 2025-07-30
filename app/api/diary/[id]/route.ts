@@ -83,7 +83,7 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const { summary, transcript, keywords, images } = body;
+    const { summary, transcript, keywords, images, emotions } = body;
 
     // 일기 소유권 확인
     const { data: existingDiary, error: checkError } = await supabase
@@ -130,6 +130,28 @@ export async function PATCH(
         await supabase
           .from('keywords')
           .insert(keywordData);
+      }
+    }
+
+    // 감정 업데이트 (기존 삭제 후 새로 추가)
+    if (emotions && Array.isArray(emotions)) {
+      // 기존 감정 삭제
+      await supabase
+        .from('emotions')
+        .delete()
+        .eq('diary_entry_id', params.id);
+
+      // 새 감정 추가
+      if (emotions.length > 0) {
+        const emotionData = emotions.map((emotion: { type: string; score: number }) => ({
+          diary_entry_id: params.id,
+          type: emotion.type,
+          score: emotion.score,
+        }));
+
+        await supabase
+          .from('emotions')
+          .insert(emotionData);
       }
     }
 

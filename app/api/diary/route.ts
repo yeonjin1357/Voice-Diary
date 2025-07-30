@@ -86,6 +86,7 @@ export async function GET(request: NextRequest) {
       audioUrl: entry.audio_url,
       transcript: entry.transcript,
       summary: entry.summary,
+      images: entry.images || [],
       emotions: entry.emotions.map((e: { type: '기쁨' | '슬픔' | '불안' | '분노' | '평온' | '기대' | '놀람'; score: number }) => ({
         type: e.type,
         score: e.score,

@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { MobileLayout } from '@/components/layout/mobile-layout'
-import { DiaryEntryWithRelations, Keyword } from '@/types'
+import { DiaryEntryWithRelations, Keyword, Emotion } from '@/types'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { AudioPlayer } from '@/components/audio-player'
 import { ImageUpload } from '@/components/diary/image-upload'
+import { EmotionEditor } from '@/components/diary/emotion-editor'
 import {
   ArrowLeft,
   Calendar,
@@ -58,6 +59,7 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
   const [isSaving, setIsSaving] = useState(false)
   const [newKeyword, setNewKeyword] = useState('')
   const [editedImages, setEditedImages] = useState<string[]>([])
+  const [editedEmotions, setEditedEmotions] = useState<Emotion[]>([])
 
   useEffect(() => {
     params.then((p) => {
@@ -90,6 +92,7 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
       setEditedTranscript(diary.transcript || '')
       setEditedKeywords(diary.keywords?.map((k: Keyword) => k.keyword) || [])
       setEditedImages(diary.images || [])
+      setEditedEmotions(diary.emotions || [])
     } catch (err) {
       setError(err instanceof Error ? err.message : '오류가 발생했습니다.')
     } finally {
@@ -130,6 +133,7 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
       setEditedTranscript(diary.transcript || '')
       setEditedKeywords(diary.keywords?.map((k: Keyword) => k.keyword) || [])
       setEditedImages(diary.images || [])
+      setEditedEmotions(diary.emotions || [])
     }
   }
 
@@ -148,6 +152,7 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
           transcript: editedTranscript,
           keywords: editedKeywords,
           images: editedImages,
+          emotions: editedEmotions,
         }),
       })
 
@@ -273,37 +278,44 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
         {/* 감정 분석 */}
         <div className="rounded-2xl border border-gray-100 bg-white p-5">
           <h2 className="mb-4 font-medium text-gray-900">오늘의 감정</h2>
-          <div className="space-y-3">
-            {diary.emotions.map((emotion) => (
-              <div
-                key={emotion.type}
-                className="flex items-center justify-between"
-              >
-                <span
-                  className={cn(
-                    'inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-medium',
-                    emotionColors[emotion.type],
-                  )}
+          {isEditing ? (
+            <EmotionEditor
+              emotions={editedEmotions}
+              onEmotionsChange={setEditedEmotions}
+            />
+          ) : (
+            <div className="space-y-3">
+              {diary.emotions.map((emotion) => (
+                <div
+                  key={emotion.type}
+                  className="flex items-center justify-between"
                 >
-                  {emotion.type}
-                </span>
-                <div className="flex items-center gap-3">
-                  <div className="h-2 w-32 rounded-full bg-gray-100">
-                    <div
-                      className={cn(
-                        'h-2 rounded-full bg-gradient-to-r',
-                        emotionGradients[emotion.type],
-                      )}
-                      style={{ width: `${emotion.score}%` }}
-                    />
-                  </div>
-                  <span className="w-10 text-right text-sm font-medium text-gray-700">
-                    {emotion.score}%
+                  <span
+                    className={cn(
+                      'inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-medium',
+                      emotionColors[emotion.type],
+                    )}
+                  >
+                    {emotion.type}
                   </span>
+                  <div className="flex items-center gap-3">
+                    <div className="h-2 w-32 rounded-full bg-gray-100">
+                      <div
+                        className={cn(
+                          'h-2 rounded-full bg-gradient-to-r',
+                          emotionGradients[emotion.type],
+                        )}
+                        style={{ width: `${emotion.score}%` }}
+                      />
+                    </div>
+                    <span className="w-10 text-right text-sm font-medium text-gray-700">
+                      {emotion.score}%
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* 요약 */}

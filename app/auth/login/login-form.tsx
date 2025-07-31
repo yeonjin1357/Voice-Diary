@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Home } from 'lucide-react'
+import { Home, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { toast } from 'sonner'
@@ -26,6 +26,8 @@ export default function LoginForm() {
   const [passwordError, setPasswordError] = useState(false)
   const [confirmPasswordError, setConfirmPasswordError] = useState(false)
   const [isCheckingEmail, setIsCheckingEmail] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const emailRef = useRef<HTMLInputElement>(null)
   const passwordRef = useRef<HTMLInputElement>(null)
@@ -279,21 +281,35 @@ export default function LoginForm() {
 
             <div className="space-y-3">
               <Label htmlFor="password" className="text-base font-medium">비밀번호</Label>
-              <Input
-                ref={passwordRef}
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setPassword(e.target.value)
-                  setPasswordError(false)
-                }}
-                className={`h-12 text-base ${
-                  passwordError ? 'border-red-500 focus:ring-red-500' : ''
-                }`}
-                required
-              />
+              <div className="relative">
+                <Input
+                  ref={passwordRef}
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    setPassword(e.target.value)
+                    setPasswordError(false)
+                  }}
+                  className={`h-12 text-base pr-12 ${
+                    passwordError ? 'border-red-500 focus:ring-red-500' : ''
+                  }`}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+                  tabIndex={-1}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
               {isSignUp && (
                 <p className="text-sm text-neutral-500">
                   최소 6자 이상 입력해주세요
@@ -304,23 +320,37 @@ export default function LoginForm() {
             {isSignUp && (
               <div className="space-y-3">
                 <Label htmlFor="confirmPassword" className="text-base font-medium">비밀번호 확인</Label>
-                <Input
-                  ref={confirmPasswordRef}
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="••••••••"
-                  value={confirmPassword}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setConfirmPassword(e.target.value)
-                    setConfirmPasswordError(false)
-                  }}
-                  className={`h-12 text-base ${
-                    confirmPasswordError
-                      ? 'border-red-500 focus:ring-red-500'
-                      : ''
-                  }`}
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    ref={confirmPasswordRef}
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      setConfirmPassword(e.target.value)
+                      setConfirmPasswordError(false)
+                    }}
+                    className={`h-12 text-base pr-12 ${
+                      confirmPasswordError
+                        ? 'border-red-500 focus:ring-red-500'
+                        : ''
+                    }`}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+                    tabIndex={-1}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
               </div>
             )}
 

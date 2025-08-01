@@ -61,17 +61,16 @@ export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const header = (
-    <div className="flex items-center justify-between bg-white px-4 py-3 border-b border-gray-100">
-      <button
+    <div className="flex items-center bg-white px-4 py-3">
+      <Button
+        variant="ghost"
+        size="icon"
         onClick={() => router.back()}
-        className="p-2 -m-2 rounded-full hover:bg-gray-50 transition-all active:scale-95"
+        className="mr-3 h-9 w-9"
       >
-        <ArrowLeft className="w-5 h-5 text-gray-600" />
-      </button>
-      
-      <h1 className="font-medium text-lg text-gray-900">문의하기</h1>
-      
-      <div className="w-9" />
+        <ArrowLeft className="h-5 w-5" />
+      </Button>
+      <h1 className="text-xl font-bold text-gray-900">문의하기</h1>
     </div>
   )
 

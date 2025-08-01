@@ -50,12 +50,11 @@ export default function PrivacySettingsPage() {
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
 
-
   const handleExportData = async () => {
     setIsExporting(true)
     try {
       const response = await fetch('/api/user/export')
-      
+
       if (!response.ok) {
         const error = await response.json()
         throw new Error(error.error || '데이터 내보내기에 실패했습니다')
@@ -63,26 +62,30 @@ export default function PrivacySettingsPage() {
 
       // Blob으로 변환
       const blob = await response.blob()
-      
+
       // 다운로드 링크 생성
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = response.headers.get('content-disposition')?.split('filename=')[1]?.replace(/"/g, '') || 'voice_diary_export.zip'
+      a.download =
+        response.headers
+          .get('content-disposition')
+          ?.split('filename=')[1]
+          ?.replace(/"/g, '') || 'voice_diary_export.zip'
       document.body.appendChild(a)
       a.click()
-      
+
       // 정리
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
-      
+
       toast.success('데이터 내보내기가 완료되었습니다')
       setShowExportDialog(false)
     } catch (error) {
       toast.error(
-        error instanceof Error 
-          ? error.message 
-          : '데이터 내보내기에 실패했습니다'
+        error instanceof Error
+          ? error.message
+          : '데이터 내보내기에 실패했습니다',
       )
     } finally {
       setIsExporting(false)
@@ -95,7 +98,7 @@ export default function PrivacySettingsPage() {
       toast.error('새 비밀번호가 일치하지 않습니다')
       return
     }
-    
+
     if (newPassword.length < 6) {
       toast.error('비밀번호는 최소 6자 이상이어야 합니다')
       return
@@ -128,9 +131,7 @@ export default function PrivacySettingsPage() {
       setConfirmPassword('')
     } catch (error) {
       toast.error(
-        error instanceof Error 
-          ? error.message 
-          : '비밀번호 변경에 실패했습니다'
+        error instanceof Error ? error.message : '비밀번호 변경에 실패했습니다',
       )
     } finally {
       setIsChangingPassword(false)
@@ -175,7 +176,7 @@ export default function PrivacySettingsPage() {
   ]
 
   const header = (
-    <div className="flex items-center bg-white px-5 py-4">
+    <div className="flex items-center bg-white px-4 py-3">
       <Button
         variant="ghost"
         size="icon"
@@ -193,8 +194,8 @@ export default function PrivacySettingsPage() {
       <div className="pb-8">
         {/* 설정 섹션들 */}
         {settingSections.map((section, sectionIndex) => (
-          <div key={sectionIndex} className="mb-6">
-            <div className="mb-3 px-5">
+          <div key={sectionIndex}>
+            <div className="mt-6 mb-3 px-5">
               <h2 className="text-sm font-medium text-gray-700">
                 {section.title}
               </h2>
@@ -257,15 +258,18 @@ export default function PrivacySettingsPage() {
       </div>
 
       {/* 비밀번호 변경 다이얼로그 */}
-      <Dialog open={showPasswordDialog} onOpenChange={(open) => {
-        setShowPasswordDialog(open)
-        if (!open) {
-          // 다이얼로그 닫을 때 폼 초기화
-          setCurrentPassword('')
-          setNewPassword('')
-          setConfirmPassword('')
-        }
-      }}>
+      <Dialog
+        open={showPasswordDialog}
+        onOpenChange={(open) => {
+          setShowPasswordDialog(open)
+          if (!open) {
+            // 다이얼로그 닫을 때 폼 초기화
+            setCurrentPassword('')
+            setNewPassword('')
+            setConfirmPassword('')
+          }
+        }}
+      >
         <DialogContent className="mx-4 max-w-[360px] rounded-2xl bg-white">
           <DialogHeader>
             <DialogTitle>비밀번호 변경</DialogTitle>
@@ -293,7 +297,9 @@ export default function PrivacySettingsPage() {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
               />
-              <p className="text-xs text-gray-500">최소 6자 이상 입력해주세요</p>
+              <p className="text-xs text-gray-500">
+                최소 6자 이상 입력해주세요
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirm-password">새 비밀번호 확인</Label>
@@ -316,7 +322,12 @@ export default function PrivacySettingsPage() {
             </Button>
             <Button
               onClick={handlePasswordChange}
-              disabled={isChangingPassword || !currentPassword || !newPassword || !confirmPassword}
+              disabled={
+                isChangingPassword ||
+                !currentPassword ||
+                !newPassword ||
+                !confirmPassword
+              }
             >
               {isChangingPassword ? (
                 <div className="flex items-center space-x-2">
@@ -336,9 +347,7 @@ export default function PrivacySettingsPage() {
         <DialogContent className="mx-4 max-w-[360px] rounded-2xl bg-white">
           <DialogHeader>
             <DialogTitle>데이터 내보내기</DialogTitle>
-            <DialogDescription>
-              모든 데이터를 다운로드합니다
-            </DialogDescription>
+            <DialogDescription>모든 데이터를 다운로드합니다</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="rounded-lg bg-gray-50 p-4">

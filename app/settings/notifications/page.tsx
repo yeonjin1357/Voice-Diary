@@ -48,7 +48,7 @@ export default function NotificationSettingsPage() {
   const router = useRouter()
   const [showReminderSettings, setShowReminderSettings] = useState(false)
   const [showQuietHoursSettings, setShowQuietHoursSettings] = useState(false)
-  
+
   // 아이콘 매핑
   const iconMap: Record<string, LucideIcon> = {
     Bell,
@@ -56,7 +56,6 @@ export default function NotificationSettingsPage() {
     Calendar,
     Moon,
   }
-  
 
   const getDefaultNotifications = (): NotificationItem[] => {
     return [
@@ -101,12 +100,20 @@ export default function NotificationSettingsPage() {
       },
     ]
   }
-  
-  const [notifications, setNotifications] = useState<NotificationItem[]>(getDefaultNotifications())
+
+  const [notifications, setNotifications] = useState<NotificationItem[]>(
+    getDefaultNotifications(),
+  )
 
   const [reminderFrequency, setReminderFrequency] = useState('daily')
   const [reminderTime, setReminderTime] = useState('21:00')
-  const [selectedDays, setSelectedDays] = useState<string[]>(['월', '화', '수', '목', '금'])
+  const [selectedDays, setSelectedDays] = useState<string[]>([
+    '월',
+    '화',
+    '수',
+    '목',
+    '금',
+  ])
   const [quietStartTime, setQuietStartTime] = useState('23:00')
   const [quietEndTime, setQuietEndTime] = useState('07:00')
 
@@ -117,9 +124,11 @@ export default function NotificationSettingsPage() {
       try {
         const parsed = JSON.parse(saved)
         setNotifications(parsed)
-        
+
         // 리마인더 설정 복원
-        const reminder = parsed.find((n: NotificationItem) => n.id === 'reminder')
+        const reminder = parsed.find(
+          (n: NotificationItem) => n.id === 'reminder',
+        )
         if (reminder?.settings) {
           setReminderFrequency(reminder.settings.frequency || 'daily')
           setReminderTime(reminder.settings.time || '21:00')
@@ -127,9 +136,11 @@ export default function NotificationSettingsPage() {
             setSelectedDays(reminder.settings.days)
           }
         }
-        
+
         // 방해 금지 시간 설정 복원
-        const quietHours = parsed.find((n: NotificationItem) => n.id === 'quiet-hours')
+        const quietHours = parsed.find(
+          (n: NotificationItem) => n.id === 'quiet-hours',
+        )
         if (quietHours?.settings?.time) {
           const [start, end] = quietHours.settings.time.split('-')
           setQuietStartTime(start || '23:00')
@@ -144,7 +155,10 @@ export default function NotificationSettingsPage() {
   // localStorage에 설정 저장
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('notificationSettings', JSON.stringify(notifications))
+      localStorage.setItem(
+        'notificationSettings',
+        JSON.stringify(notifications),
+      )
     }
   }, [notifications])
 
@@ -154,7 +168,7 @@ export default function NotificationSettingsPage() {
         item.id === id ? { ...item, enabled: !item.enabled } : item,
       ),
     )
-    
+
     const notification = notifications.find((n) => n.id === id)
     if (notification) {
       toast.success(
@@ -217,7 +231,7 @@ export default function NotificationSettingsPage() {
   }
 
   const header = (
-    <div className="flex items-center bg-white px-5 py-4">
+    <div className="flex items-center bg-white px-4 py-3">
       <Button
         variant="ghost"
         size="icon"
@@ -234,7 +248,7 @@ export default function NotificationSettingsPage() {
     <MobileLayout header={header} className="bg-gray-50">
       <div className="pb-8">
         {/* 알림 권한 안내 */}
-        <div className="mb-6 mx-5 mt-4 rounded-xl bg-blue-50 p-4">
+        <div className="mx-5 mt-4 mb-6 rounded-xl bg-blue-50 p-4">
           <div className="flex space-x-3">
             <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
             <div>
@@ -265,11 +279,13 @@ export default function NotificationSettingsPage() {
               }`}
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3 flex-1">
+                <div className="flex flex-1 items-center space-x-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100">
                     {(() => {
                       const Icon = iconMap[item.iconName]
-                      return Icon ? <Icon className="h-5 w-5 text-gray-700" /> : null
+                      return Icon ? (
+                        <Icon className="h-5 w-5 text-gray-700" />
+                      ) : null
                     })()}
                   </div>
                   <div className="flex-1 pr-3">
@@ -335,7 +351,7 @@ export default function NotificationSettingsPage() {
         <div className="mt-8 px-5">
           <Button
             variant="outline"
-            className="w-full h-12"
+            className="h-12 w-full"
             onClick={() => {
               toast.success('테스트 알림입니다! 🔔')
             }}
@@ -361,7 +377,10 @@ export default function NotificationSettingsPage() {
       </div>
 
       {/* 리마인더 설정 다이얼로그 */}
-      <Dialog open={showReminderSettings} onOpenChange={setShowReminderSettings}>
+      <Dialog
+        open={showReminderSettings}
+        onOpenChange={setShowReminderSettings}
+      >
         <DialogContent className="mx-4 max-w-[360px] rounded-2xl bg-white">
           <DialogHeader>
             <DialogTitle>리마인더 상세 설정</DialogTitle>
@@ -400,7 +419,7 @@ export default function NotificationSettingsPage() {
             <div className="space-y-3">
               <Label htmlFor="time">알림 시간</Label>
               <div className="relative">
-                <Clock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                <Clock className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
                 <input
                   id="time"
                   type="time"
@@ -451,7 +470,10 @@ export default function NotificationSettingsPage() {
       </Dialog>
 
       {/* 방해 금지 시간 설정 다이얼로그 */}
-      <Dialog open={showQuietHoursSettings} onOpenChange={setShowQuietHoursSettings}>
+      <Dialog
+        open={showQuietHoursSettings}
+        onOpenChange={setShowQuietHoursSettings}
+      >
         <DialogContent className="mx-4 max-w-[360px] rounded-2xl bg-white">
           <DialogHeader>
             <DialogTitle>방해 금지 시간 설정</DialogTitle>
@@ -463,7 +485,7 @@ export default function NotificationSettingsPage() {
             <div className="space-y-3">
               <Label htmlFor="start-time">시작 시간</Label>
               <div className="relative">
-                <Moon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                <Moon className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
                 <input
                   id="start-time"
                   type="time"
@@ -477,7 +499,7 @@ export default function NotificationSettingsPage() {
             <div className="space-y-3">
               <Label htmlFor="end-time">종료 시간</Label>
               <div className="relative">
-                <Clock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                <Clock className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
                 <input
                   id="end-time"
                   type="time"
@@ -490,7 +512,8 @@ export default function NotificationSettingsPage() {
 
             <div className="rounded-lg bg-gray-50 p-4">
               <p className="text-sm text-gray-700">
-                {quietStartTime}부터 다음날 {quietEndTime}까지 알림을 보내지 않습니다
+                {quietStartTime}부터 다음날 {quietEndTime}까지 알림을 보내지
+                않습니다
               </p>
             </div>
           </div>

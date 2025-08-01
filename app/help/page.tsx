@@ -6,12 +6,12 @@ import { Input } from '@/components/ui/input'
 import {
   Search,
   ChevronRight,
+  ChevronLeft,
   Mic,
   FileText,
   Shield,
   Bell,
   HelpCircle,
-  X,
   LucideIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -199,27 +199,29 @@ export default function HelpPage() {
   }
 
   const header = (
-    <div className="bg-white px-5 py-4">
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-gray-900">도움말</h1>
+    <div>
+      <div className="flex items-center bg-white px-4 py-3">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => router.back()}
-          className="h-9 w-9"
+          className="mr-3 h-9 w-9"
         >
-          <X className="h-5 w-5" />
+          <ChevronLeft className="h-5 w-5" />
         </Button>
+        <h1 className="text-xl font-bold text-gray-900">도움말</h1>
       </div>
-      <div className="relative">
-        <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
-        <Input
-          type="search"
-          placeholder="궁금한 내용을 검색하세요"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="h-12 pr-4 pl-10 text-base"
-        />
+      <div className="border-gray-100 bg-white px-4 pb-3">
+        <div className="relative">
+          <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
+          <Input
+            type="search"
+            placeholder="궁금한 내용을 검색하세요"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="h-12 pr-4 pl-10 text-base"
+          />
+        </div>
       </div>
     </div>
   )

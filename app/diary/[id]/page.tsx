@@ -9,15 +9,7 @@ import { Input } from '@/components/ui/input'
 import { AudioPlayer } from '@/components/audio-player'
 import { ImageUpload } from '@/components/diary/image-upload'
 import { EmotionEditor } from '@/components/diary/emotion-editor'
-import {
-  ArrowLeft,
-  Calendar,
-  Hash,
-  Trash2,
-  Edit,
-  X,
-  Plus,
-} from 'lucide-react'
+import { ArrowLeft, Calendar, Hash, Trash2, Edit, X, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
 
@@ -121,7 +113,6 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
     }
   }
 
-
   const handleEdit = () => {
     setIsEditing(true)
   }
@@ -202,7 +193,7 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
     <div className="flex items-center justify-between border-b border-gray-100 bg-white px-4 py-3">
       <button
         onClick={() => router.back()}
-        className="-m-2 rounded-full p-2 transition-all hover:bg-gray-50 active:scale-95"
+        className="-m-2 w-[56px] rounded-full p-2 transition-all hover:bg-gray-50 active:scale-95"
       >
         <ArrowLeft className="h-5 w-5 text-gray-600" />
       </button>
@@ -339,8 +330,8 @@ export default function DiaryDetailPage({ params }: DiaryDetailPageProps) {
         {diary.audioUrl && (
           <div className="rounded-2xl border border-gray-100 bg-white p-5">
             <h2 className="mb-4 font-medium text-gray-900">음성 녹음</h2>
-            <AudioPlayer 
-              audioUrl={diary.audioUrl} 
+            <AudioPlayer
+              audioUrl={diary.audioUrl}
               fileName={`diary-${diary.date}.webm`}
               initialDuration={diary.audioDuration}
             />

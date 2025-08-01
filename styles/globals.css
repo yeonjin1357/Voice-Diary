@@ -96,4 +96,21 @@
   *:focus {
     outline: none !important;
   }
+  
+  /* 스크롤바 숨기기 - 모든 브라우저 지원 */
+  * {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+  
+  /* Webkit 브라우저 (Chrome, Safari, Edge) */
+  *::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* 스크롤은 가능하지만 스크롤바는 보이지 않음 */
+  html, body {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
+  }
 }

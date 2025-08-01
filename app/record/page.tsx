@@ -354,15 +354,20 @@ export default function RecordPage() {
         {/* 팁 카드 */}
         <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50 p-4 dark:border-purple-800 dark:from-purple-900/20 dark:to-pink-900/20">
           <p className="text-sm text-purple-700 dark:text-purple-300">
-            💭 편안한 마음으로 오늘 있었던 일과 느낀 감정을 자유롭게
-            이야기해주세요
+            <span className="hidden min-[500px]:inline">
+              💭 편안한 마음으로 오늘 있었던 일과 느낀 감정을 자유롭게
+              이야기해주세요
+            </span>
+            <span className="inline min-[500px]:hidden">
+              💭 오늘 있었던 일과 느낀 감정을 이야기해주세요
+            </span>
           </p>
         </Card>
       </div>
 
       {/* 텍스트 편집 다이얼로그 */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent className="mx-4 max-h-[90vh] max-w-[500px] overflow-y-auto rounded-2xl bg-white p-0 shadow-xl">
+        <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-[500px] overflow-y-auto rounded-2xl bg-white p-0 shadow-xl">
           <DialogHeader className="border-b border-gray-100 px-6 py-5">
             <DialogTitle className="text-xl font-semibold text-gray-900">
               음성 인식 결과

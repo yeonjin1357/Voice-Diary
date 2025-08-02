@@ -63,9 +63,31 @@
   * {
     border-color: hsl(var(--border));
   }
+  
+  /* 전역 스크롤바 제거 - 최우선 순위 */
+  html {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    overflow-y: scroll !important;
+  }
+  
+  html::-webkit-scrollbar {
+    display: none !important;
+    width: 0px !important;
+    background: transparent !important;
+  }
+  
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  
+  body::-webkit-scrollbar {
+    display: none !important;
+    width: 0px !important;
+    background: transparent !important;
   }
   
   /* Recharts 차트 클릭 시 outline 제거 */
@@ -98,16 +120,19 @@
   }
   
   /* 스크롤바 숨기기 - 모든 브라우저 및 모바일 지원 */
-  * {
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
+  *, *::before, *::after {
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* IE and Edge */
   }
   
-  /* Webkit 브라우저 (Chrome, Safari, Edge) */
-  *::-webkit-scrollbar {
+  /* Webkit 브라우저 (Chrome, Safari, Edge) - 모든 의사 요소 포함 */
+  *::-webkit-scrollbar,
+  *::before::-webkit-scrollbar,
+  *::after::-webkit-scrollbar {
+    width: 0px !important;
+    height: 0px !important;
     display: none !important;
-    width: 0 !important;
-    height: 0 !important;
+    background: transparent !important;
   }
   
   /* 모바일 특정 스크롤바 숨기기 */

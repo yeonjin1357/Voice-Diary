@@ -42,7 +42,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ko">
+    <html lang="ko" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
         <meta name="theme-color" content="#0a0a0a" />
@@ -52,6 +52,19 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="울림" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.svg" />
         <link rel="icon" type="image/svg+xml" href="/icons/icon-192x192.svg" />
+        <style dangerouslySetInnerHTML={{ __html: `
+          html, body, * {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+          }
+          html::-webkit-scrollbar,
+          body::-webkit-scrollbar,
+          *::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+          }
+        ` }} />
       </head>
       <body className={`${inter.className} overflow-y-auto overflow-x-hidden`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
         <Providers>{children}</Providers>

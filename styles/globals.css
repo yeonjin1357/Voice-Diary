@@ -97,7 +97,7 @@
     outline: none !important;
   }
   
-  /* 스크롤바 숨기기 - 모든 브라우저 지원 */
+  /* 스크롤바 숨기기 - 모든 브라우저 및 모바일 지원 */
   * {
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE and Edge */
@@ -105,12 +105,51 @@
   
   /* Webkit 브라우저 (Chrome, Safari, Edge) */
   *::-webkit-scrollbar {
-    display: none;
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  
+  /* 모바일 특정 스크롤바 숨기기 */
+  html,
+  body,
+  div,
+  main,
+  section,
+  article,
+  aside,
+  nav {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar,
+  div::-webkit-scrollbar,
+  main::-webkit-scrollbar,
+  section::-webkit-scrollbar,
+  article::-webkit-scrollbar,
+  aside::-webkit-scrollbar,
+  nav::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
   }
   
   /* 스크롤은 가능하지만 스크롤바는 보이지 않음 */
   html, body {
     overflow-y: auto;
+    overflow-x: hidden;
     -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
+  }
+  
+  /* 모바일 뷰포트 최적화 */
+  @supports (-webkit-touch-callout: none) {
+    /* iOS 특정 스타일 */
+    html, body {
+      position: relative;
+      overflow-y: scroll;
+      -webkit-overflow-scrolling: touch;
+    }
   }
 }

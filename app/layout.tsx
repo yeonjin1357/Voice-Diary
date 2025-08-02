@@ -53,7 +53,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/icon-192x192.svg" />
         <link rel="icon" type="image/svg+xml" href="/icons/icon-192x192.svg" />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.className} overflow-y-auto overflow-x-hidden`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
         <Providers>{children}</Providers>
         <Toaster position="top-center" richColors />
       </body>

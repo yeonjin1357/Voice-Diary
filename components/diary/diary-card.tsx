@@ -32,8 +32,8 @@ export function DiaryCard({ diary, onClick }: DiaryCardProps) {
             {/* 날짜 */}
             <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
               <Calendar className="h-4 w-4" />
-              <span className="font-medium">{formatDate(new Date(diary.date))}</span>
-              <span className="text-gray-400">({getDayOfWeek(new Date(diary.date))})</span>
+              <span className="font-medium">{formatDate(diary.date)}</span>
+              <span className="text-gray-400">({getDayOfWeek(diary.date)})</span>
             </div>
             
             {/* 요약 (한 줄만) */}

@@ -53,16 +53,63 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/icon-192x192.svg" />
         <link rel="icon" type="image/svg+xml" href="/icons/icon-192x192.svg" />
         <style dangerouslySetInnerHTML={{ __html: `
-          html, body, * {
+          /* 모든 브라우저에서 스크롤바 완전 제거 */
+          html, body, *, *::before, *::after {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+            scrollbar-color: transparent transparent !important;
+          }
+          
+          /* Webkit 기반 브라우저 (Chrome, Safari, Edge, Whale) */
+          html::-webkit-scrollbar,
+          body::-webkit-scrollbar,
+          *::-webkit-scrollbar,
+          *::before::-webkit-scrollbar,
+          *::after::-webkit-scrollbar {
+            display: none !important;
+            width: 0px !important;
+            height: 0px !important;
+            background: transparent !important;
+            -webkit-appearance: none !important;
+          }
+          
+          /* 스크롤바 구성 요소들도 숨김 */
+          *::-webkit-scrollbar-track,
+          *::-webkit-scrollbar-thumb,
+          *::-webkit-scrollbar-corner,
+          *::-webkit-scrollbar-button {
+            display: none !important;
+            width: 0px !important;
+            height: 0px !important;
+            background: transparent !important;
+          }
+          
+          /* 루트 요소에도 적용 */
+          :root {
             scrollbar-width: none !important;
             -ms-overflow-style: none !important;
           }
-          html::-webkit-scrollbar,
-          body::-webkit-scrollbar,
-          *::-webkit-scrollbar {
+          
+          :root::-webkit-scrollbar {
             display: none !important;
-            width: 0 !important;
-            height: 0 !important;
+            width: 0px !important;
+            height: 0px !important;
+          }
+          
+          /* 모바일 웹뷰 및 PWA 환경 */
+          @supports (-webkit-touch-callout: none) {
+            html, body {
+              -webkit-overflow-scrolling: touch !important;
+            }
+          }
+          
+          /* 네이버 웨일 브라우저 특별 처리 */
+          @media screen and (-webkit-min-device-pixel-ratio: 0) {
+            ::-webkit-scrollbar {
+              width: 0px !important;
+              height: 0px !important;
+              display: none !important;
+            }
           }
         ` }} />
       </head>

@@ -55,7 +55,6 @@ export const usePWAInstall = () => {
       
       return false
     } catch (error) {
-      // Error installing PWA: error
       return false
     }
   }

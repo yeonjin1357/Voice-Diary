@@ -104,7 +104,6 @@ export default function ProfilePage() {
       toast.success(result.message || '회원 탈퇴가 완료되었습니다')
       router.push('/auth/login')
     } catch (error) {
-      // Delete account error: error
       toast.error(
         error instanceof Error
           ? error.message

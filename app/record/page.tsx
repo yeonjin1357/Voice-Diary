@@ -3,14 +3,16 @@
 import { useState, useEffect, useCallback } from 'react'
 import { MobileLayout } from '@/components/layout/mobile-layout'
 import { useRecorder } from '@/hooks/useRecorder'
+import { useAuth } from '@/hooks/useAuth'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Mic, Square, Pause, Play, Send, RotateCcw, Edit3 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, formatTime } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { uploadAudioFile } from '@/lib/supabase/storage'
+import { handleError } from '@/lib/error-handler'
 import { Textarea } from '@/components/ui/textarea'
 import {
   Dialog,
@@ -41,27 +43,9 @@ export default function RecordPage() {
   const [editedTranscript, setEditedTranscript] = useState<string>('')
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState('')
+  const { user, loading: authLoading } = useAuth()
   const supabase = createClient()
 
-  useEffect(() => {
-    const checkUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (!user) {
-        toast.error('로그인이 필요합니다')
-        router.push('/auth/login')
-      }
-    }
-
-    checkUser()
-  }, [supabase.auth, router])
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}:${secs.toString().padStart(2, '0')}`
-  }
 
   const handleStartRecording = async () => {
     try {
@@ -71,7 +55,7 @@ export default function RecordPage() {
         .from('diary_entries')
         .select('id')
         .eq('date', today)
-        .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
+        .eq('user_id', user?.id)
 
       if (!error && todayDiaries && todayDiaries.length >= 2) {
         toast.error('하루에 최대 2개의 일기만 작성할 수 있습니다')
@@ -81,12 +65,7 @@ export default function RecordPage() {
       await startRecording()
       setAudioBlob(null)
     } catch (error) {
-      // 녹음 시작 실패: error
-      if (error instanceof Error) {
-        toast.error(error.message)
-      } else {
-        toast.error('마이크 사용 권한을 허용해주세요')
-      }
+      handleError(error, '마이크 사용 권한을 허용해주세요')
     }
   }
 
@@ -128,12 +107,7 @@ export default function RecordPage() {
       setEditedTranscript(text)
       setShowEditDialog(true)
     } catch (error) {
-      // 변환 실패: error
-      if (error instanceof Error) {
-        toast.error(error.message)
-      } else {
-        toast.error('음성 변환 중 오류가 발생했습니다')
-      }
+      handleError(error, '음성 변환 중 오류가 발생했습니다')
     } finally {
       setIsProcessing(false)
     }
@@ -144,17 +118,15 @@ export default function RecordPage() {
     setLoadingMessage('감정을 분석하고 일기를 저장하고 있습니다')
     try {
       // 1. 음성 파일 업로드
-      const user = await supabase.auth.getUser()
-      if (!user.data.user) {
+      if (!user) {
         throw new Error('로그인이 필요합니다')
       }
 
       let audioUrl: string | null = null
       if (audioBlob) {
         const today = new Date().toISOString().split('T')[0]
-        audioUrl = await uploadAudioFile(user.data.user.id, audioBlob, today)
+        audioUrl = await uploadAudioFile(user.id, audioBlob, today)
         if (!audioUrl) {
-          // 음성 파일 업로드 실패, 계속 진행합니다
         }
       }
 
@@ -194,7 +166,6 @@ export default function RecordPage() {
 
       if (!diaryResponse.ok) {
         const errorData = await diaryResponse.json()
-        // 일기 저장 실패: errorData
         throw new Error(errorData.error || '일기 저장에 실패했습니다')
       }
 
@@ -203,12 +174,7 @@ export default function RecordPage() {
       // 4. 일기 상세 페이지로 이동
       router.push(`/diary/${diaryId}`)
     } catch (error) {
-      // 저장 실패: error
-      if (error instanceof Error) {
-        toast.error(error.message)
-      } else {
-        toast.error('일기 저장 중 오류가 발생했습니다')
-      }
+      handleError(error, '일기 저장 중 오류가 발생했습니다')
     } finally {
       setIsProcessing(false)
     }
@@ -230,6 +196,19 @@ export default function RecordPage() {
       }
     }
   }, [recordingTime, isRecording, handleStopRecording])
+
+  if (authLoading) {
+    return (
+      <MobileLayout header={header}>
+        <div className="flex h-[calc(100vh-8rem)] items-center justify-center">
+          <div className="text-center">
+            <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-purple-500" />
+            <p className="text-sm text-gray-500">로그인 확인 중...</p>
+          </div>
+        </div>
+      </MobileLayout>
+    )
+  }
 
   return (
     <MobileLayout header={header}>

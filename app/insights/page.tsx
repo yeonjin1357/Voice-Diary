@@ -9,6 +9,7 @@ import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import { toast } from 'sonner'
 import { MobileLayout } from '@/components/layout/mobile-layout'
+import { EMOTION_CHART_COLORS } from '@/lib/constants/emotions'
 
 interface EmotionData {
   type: string
@@ -28,15 +29,6 @@ interface KeywordData {
   count: number
 }
 
-const EMOTION_COLORS = {
-  '기쁨': '#f59e0b',
-  '슬픔': '#3b82f6',
-  '불안': '#ef4444',
-  '분노': '#f97316',
-  '평온': '#10b981',
-  '기대': '#8b5cf6',
-  '놀람': '#eab308',
-}
 
 export default function InsightsPage() {
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'year'>('month')
@@ -92,7 +84,6 @@ export default function InsightsPage() {
       }
     } catch {
       toast.error('인사이트 데이터를 불러오는데 실패했습니다.')
-      // Error fetching insights: error
     } finally {
       setIsLoading(false)
     }
@@ -240,12 +231,12 @@ export default function InsightsPage() {
                     <YAxis tick={{ fontSize: 12 }} tickLine={false} />
                     <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb' }} />
                     <Legend iconType="circle" />
-                    {Object.keys(EMOTION_COLORS).map(emotion => (
+                    {Object.keys(EMOTION_CHART_COLORS).map(emotion => (
                       <Line
                         key={emotion}
                         type="monotone"
                         dataKey={emotion}
-                        stroke={EMOTION_COLORS[emotion as keyof typeof EMOTION_COLORS]}
+                        stroke={EMOTION_CHART_COLORS[emotion as keyof typeof EMOTION_CHART_COLORS]}
                         strokeWidth={2}
                         dot={{ r: 3 }}
                         activeDot={{ r: 5 }}

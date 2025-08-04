@@ -71,7 +71,6 @@ export function AudioPlayer({ audioUrl, fileName = 'recording.webm', initialDura
             setIsAudioReady(true)
           }
         } catch {
-          // Failed to get duration from seek: error
         }
       }
       setCurrentTime(audio.currentTime)
@@ -163,7 +162,6 @@ export function AudioPlayer({ audioUrl, fileName = 'recording.webm', initialDura
         setIsPlaying(true)
       }
     } catch {
-      // Error playing audio: error
     } finally {
       setIsLoading(false)
     }
@@ -196,7 +194,6 @@ export function AudioPlayer({ audioUrl, fileName = 'recording.webm', initialDura
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
     } catch {
-      // Download error: error
     }
   }
 

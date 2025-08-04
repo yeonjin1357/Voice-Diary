@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
+import { formatMonthYear } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 import { SearchFilter, SearchFilterValues } from '@/components/diary/search-filter'
 
@@ -115,9 +116,6 @@ export default function DiaryPageContent() {
     }
   }
 
-  const formatMonthYear = (date: Date) => {
-    return `${date.getFullYear()}년 ${date.getMonth() + 1}월`
-  }
 
   // 일기가 있는 날짜들 추출
   const diaryDates = diaries.map((diary) => new Date(diary.date))

@@ -33,7 +33,6 @@ export function MicrophonePermission() {
       stream.getTracks().forEach(track => track.stop())
       setShowBanner(false)
     } catch {
-      // 마이크 권한 요청 실패: error
     }
   }
 

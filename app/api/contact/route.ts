@@ -156,7 +156,6 @@ export async function POST(request: NextRequest) {
       message: '문의가 성공적으로 전송되었습니다',
     })
   } catch {
-    // Contact API error: error
     return NextResponse.json(
       { error: '문의 전송 중 오류가 발생했습니다' },
       { status: 500 },

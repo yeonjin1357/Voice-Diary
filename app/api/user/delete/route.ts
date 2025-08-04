@@ -99,7 +99,6 @@ export async function DELETE() {
     })
 
   } catch {
-    // Account deletion error: error
     return NextResponse.json(
       { error: '회원 탈퇴 처리 중 오류가 발생했습니다' },
       { status: 500 }

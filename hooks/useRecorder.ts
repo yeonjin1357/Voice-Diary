@@ -105,7 +105,10 @@ export function useRecorder(): UseRecorderReturn {
       })
       
       // Audio context for visualization (모바일 호환성을 위한 처리)
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext
+      if (!AudioContextClass) {
+        throw new Error('AudioContext is not supported in this browser')
+      }
       audioContextRef.current = new AudioContextClass()
       
       // iOS에서 AudioContext 활성화
@@ -163,7 +166,6 @@ export function useRecorder(): UseRecorderReturn {
       startTimer()
       updateAudioLevel()
     } catch (error) {
-      // Error starting recording: error
       throw error
     }
   }

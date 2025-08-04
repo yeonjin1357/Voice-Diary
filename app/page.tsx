@@ -5,32 +5,10 @@ import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'
 import { MicrophonePermission } from '@/components/ui/microphone-permission'
 import { Mic, Calendar, Brain, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import type { User as SupabaseUser } from '@supabase/supabase-js'
+import { useAuth } from '@/hooks/useAuth'
 
 export default function Home() {
-  const [user, setUser] = useState<SupabaseUser | null>(null)
-  const supabase = createClient()
-
-  useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      setUser(user)
-    }
-
-    getUser()
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [supabase.auth])
+  const { user } = useAuth({ showError: false })
   const today = new Date().toLocaleDateString('ko-KR', {
     year: 'numeric',
     month: 'long',

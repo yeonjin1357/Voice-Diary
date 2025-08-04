@@ -99,7 +99,7 @@ export function DiaryCard({ diary, onClick }: DiaryCardProps) {
               key={emotion.type}
               className={cn(
                 'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border',
-                emotionColors[emotion.type]
+                EMOTION_COLORS[emotion.type]
               )}
             >
               {emotion.type} {emotion.score}%

@@ -68,7 +68,7 @@ export function ScrollbarHider() {
     })
     
     // viewport meta 태그 업데이트
-    let viewportMeta = document.querySelector('meta[name="viewport"]')
+    const viewportMeta = document.querySelector('meta[name="viewport"]')
     if (viewportMeta) {
       viewportMeta.setAttribute('content', 
         'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover'

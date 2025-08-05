@@ -41,6 +41,7 @@ export default function RecordPage() {
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [editedTranscript, setEditedTranscript] = useState<string>('')
+  const [originalTranscript, setOriginalTranscript] = useState<string>('')
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState('')
   const { user, loading: authLoading } = useAuth()
@@ -104,7 +105,26 @@ export default function RecordPage() {
       }
 
       const { transcript: text } = await transcriptResponse.json()
-      setEditedTranscript(text)
+      setOriginalTranscript(text)
+      
+      // 2. GPT-4로 텍스트 보정 및 감정 분석
+      setLoadingMessage('텍스트를 보정하고 있습니다')
+      const analysisResponse = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ transcript: text }),
+      })
+
+      if (!analysisResponse.ok) {
+        // 보정 실패 시 원본 텍스트 사용
+        setEditedTranscript(text)
+      } else {
+        const { correctedTranscript } = await analysisResponse.json()
+        setEditedTranscript(correctedTranscript || text)
+      }
+      
       setShowEditDialog(true)
     } catch (error) {
       handleError(error, '음성 변환 중 오류가 발생했습니다')
@@ -357,9 +377,26 @@ export default function RecordPage() {
           </DialogHeader>
           <div className="px-6 py-5">
             <div className="space-y-4">
+              {/* 원본과 보정본이 다른 경우 비교 표시 */}
+              {originalTranscript && originalTranscript !== editedTranscript && (
+                <div className="space-y-3 rounded-xl bg-gray-50 p-4">
+                  <p className="text-xs font-medium text-gray-500">AI가 보정한 내용</p>
+                  <div className="space-y-2">
+                    <div className="text-sm text-gray-600">
+                      <span className="font-medium">원본:</span>
+                      <p className="mt-1 text-gray-500 line-through">{originalTranscript}</p>
+                    </div>
+                    <div className="text-sm text-gray-700">
+                      <span className="font-medium">보정:</span>
+                      <p className="mt-1">{editedTranscript}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               <div>
                 <label className="mb-3 block text-sm font-medium text-gray-700">
-                  변환된 텍스트
+                  일기 내용 {originalTranscript !== editedTranscript && '(AI 보정됨)'}
                 </label>
                 <Textarea
                   value={editedTranscript}
@@ -371,7 +408,7 @@ export default function RecordPage() {
               <div className="flex items-start gap-2.5 rounded-lg bg-purple-50 p-3.5">
                 <Edit3 className="mt-0.5 h-4 w-4 flex-shrink-0 text-purple-600" />
                 <p className="text-sm leading-relaxed text-purple-700">
-                  직접 수정하여 더 정확한 일기를 작성할 수 있어요
+                  AI가 문법과 맞춤법을 자동으로 보정했어요. 추가로 수정할 수 있습니다.
                 </p>
               </div>
             </div>
@@ -383,6 +420,7 @@ export default function RecordPage() {
                 onClick={() => {
                   setShowEditDialog(false)
                   setEditedTranscript('')
+                  setOriginalTranscript('')
                 }}
                 className="flex-1 rounded-xl border-gray-200 bg-white py-6 text-gray-700 hover:bg-gray-50"
               >

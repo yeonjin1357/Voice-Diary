@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import '@/styles/globals.css'
 import { Providers } from '@/lib/providers'
 import { Toaster } from 'sonner'
+import { ScrollbarHider } from '@/components/ScrollbarHider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -113,7 +114,8 @@ export default function RootLayout({
           }
         ` }} />
       </head>
-      <body className={`${inter.className} overflow-y-auto overflow-x-hidden`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
+      <body className={`${inter.className} overflow-y-auto overflow-x-hidden no-scrollbar`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
+        <ScrollbarHider />
         <Providers>{children}</Providers>
         <Toaster position="top-center" richColors />
       </body>

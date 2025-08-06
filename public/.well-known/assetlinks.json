@@ -1,11 +1,8 @@
-[
-  {
-    "relation": ["delegate_permission/common.handle_all_urls"],
-    "target": {
-      "namespace": "android_app",
-      "package_name": "com.ullim.voicediary",
-      "sha256_cert_fingerprints":
-        ["60:D0:4C:A0:1F:C6:D1:3C:8F:78:83:95:67:DF:13:CB:61:F8:04:44:E6:FE:2C:DC:9F:E3:17:20:80:46:3C:1D"]
-    }
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.ullim.voicediary",
+    "sha256_cert_fingerprints": ["23:71:19:20:FD:B0:3C:97:8B:43:BF:68:A6:18:10:82:D7:3A:09:11:54:F3:63:F4:12:EF:36:4F:51:9D:8B:0D"]
   }
-]
+}]

@@ -1,8 +1,11 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "app.vercel.ullim.twa",
-    "sha256_cert_fingerprints": ["ED:98:38:04:49:59:E9:EA:17:83:FE:E8:C6:77:43:BE:8B:44:71:BF:24:21:E0:95:2F:56:80:11:C0:85:55:6B"]
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.ullim.voicediary",
+      "sha256_cert_fingerprints":
+        ["60:D0:4C:A0:1F:C6:D1:3C:8F:78:83:95:67:DF:13:CB:61:F8:04:44:E6:FE:2C:DC:9F:E3:17:20:80:46:3C:1D"]
+    }
   }
-}]
+]

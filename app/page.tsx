@@ -8,7 +8,7 @@ import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 
 export default function Home() {
-  const { user } = useAuth({ showError: false })
+  const { user } = useAuth({ showError: false, requireAuth: false })
   const today = new Date().toLocaleDateString('ko-KR', {
     year: 'numeric',
     month: 'long',

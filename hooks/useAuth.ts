@@ -9,10 +9,11 @@ import { toast } from 'sonner'
 interface UseAuthOptions {
   redirectTo?: string
   showError?: boolean
+  requireAuth?: boolean
 }
 
 export function useAuth(options: UseAuthOptions = {}) {
-  const { redirectTo = '/auth/login', showError = true } = options
+  const { redirectTo = '/auth/login', showError = true, requireAuth = true } = options
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
@@ -24,10 +25,12 @@ export function useAuth(options: UseAuthOptions = {}) {
         const { data: { user }, error } = await supabase.auth.getUser()
         
         if (error || !user) {
-          if (showError) {
-            toast.error('로그인이 필요합니다')
+          if (requireAuth) {
+            if (showError) {
+              toast.error('로그인이 필요합니다')
+            }
+            router.push(redirectTo)
           }
-          router.push(redirectTo)
         } else {
           setUser(user)
         }
@@ -46,7 +49,7 @@ export function useAuth(options: UseAuthOptions = {}) {
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
-      if (!session?.user && redirectTo) {
+      if (!session?.user && requireAuth && redirectTo) {
         router.push(redirectTo)
       }
     })
@@ -54,7 +57,7 @@ export function useAuth(options: UseAuthOptions = {}) {
     return () => {
       subscription.unsubscribe()
     }
-  }, [supabase.auth, router, redirectTo, showError])
+  }, [supabase.auth, router, redirectTo, showError, requireAuth])
 
   return { user, loading, isAuthenticated: !!user }
 }

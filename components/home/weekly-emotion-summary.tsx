@@ -138,7 +138,7 @@ export function WeeklyEmotionSummary() {
       </div>
       
       <div className="space-y-3">
-        {topEmotions.map((emotion, index) => (
+        {topEmotions.map((emotion) => (
           <div key={emotion.type} className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div 

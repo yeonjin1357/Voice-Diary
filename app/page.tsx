@@ -3,7 +3,8 @@
 import { MobileLayout } from '@/components/layout/mobile-layout'
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt'
 import { MicrophonePermission } from '@/components/ui/microphone-permission'
-import { Mic, Calendar, Brain, TrendingUp } from 'lucide-react'
+import { WeeklyEmotionSummary } from '@/components/home/weekly-emotion-summary'
+import { Mic, Calendar, Brain } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -74,19 +75,7 @@ export default function Home() {
         </section>
 
         {/* 최근 감정 트렌드 미리보기 */}
-        <div className="rounded-2xl border border-gray-100 bg-white p-5">
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-sm font-medium text-gray-900">
-              이번 주 감정 변화
-            </h3>
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-50">
-              <TrendingUp className="h-4 w-4 text-gray-600" />
-            </div>
-          </div>
-          <div className="flex h-24 items-center justify-center rounded-xl bg-gray-50">
-            <p className="text-sm text-gray-500">아직 기록된 일기가 없어요</p>
-          </div>
-        </div>
+        <WeeklyEmotionSummary />
       </div>
 
       <PWAInstallPrompt />

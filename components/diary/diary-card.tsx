@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import { DiaryEntryWithRelations, Emotion } from '@/types'
 import { Calendar, Hash, Image as ImageIcon } from 'lucide-react'
 import { cn, formatDate, getDayOfWeek } from '@/lib/utils'
@@ -15,9 +16,11 @@ interface DiaryCardProps {
 export function DiaryCard({ diary, onClick }: DiaryCardProps) {
 
   // 상위 2개 감정만 표시
-  const topEmotions = diary.emotions
-    .sort((a: Emotion, b: Emotion) => b.score - a.score)
-    .slice(0, 2)
+  const topEmotions = useMemo(() => 
+    diary.emotions
+      .sort((a: Emotion, b: Emotion) => b.score - a.score)
+      .slice(0, 2)
+  , [diary.emotions])
 
   // 이미지가 있는 경우와 없는 경우 다른 레이아웃 사용
   if (diary.images && diary.images.length > 0) {

@@ -6,9 +6,17 @@ import {
   SUPPORTED_AUDIO_FORMATS,
 } from '@/lib/openai/client'
 import { ApiError, handleApiError } from '@/lib/api-utils'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 export async function POST(request: NextRequest) {
   try {
+    // 사용자 인증 확인
+    const supabase = await createServerSupabaseClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      throw new ApiError('인증이 필요합니다.', 401)
+    }
+
     const formData = await request.formData()
     const audioFile = formData.get('audio') as File
 

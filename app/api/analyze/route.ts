@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { openai, GPT_MODEL } from '@/lib/openai/client'
 import { AnalysisResult, Emotion } from '@/types'
 import { ApiError, handleApiError } from '@/lib/api-utils'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 const CORRECTION_PROMPT = `당신은 한국어 음성 인식 텍스트 교정 전문가입니다. 음성 인식으로 변환된 텍스트의 오류를 수정해주세요.
 
@@ -46,6 +47,13 @@ JSON 형식으로 응답해주세요:
 
 export async function POST(request: NextRequest) {
   try {
+    // 사용자 인증 확인
+    const supabase = await createServerSupabaseClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      throw new ApiError('인증이 필요합니다.', 401)
+    }
+
     const { transcript } = await request.json()
 
     if (!transcript || typeof transcript !== 'string') {

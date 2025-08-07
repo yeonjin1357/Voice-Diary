@@ -17,9 +17,9 @@ export function useAuth(options: UseAuthOptions = {}) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
-  const supabase = createClient()
 
   useEffect(() => {
+    const supabase = createClient()
     const checkUser = async () => {
       try {
         const { data: { user }, error } = await supabase.auth.getUser()
@@ -57,7 +57,7 @@ export function useAuth(options: UseAuthOptions = {}) {
     return () => {
       subscription.unsubscribe()
     }
-  }, [supabase.auth, router, redirectTo, showError, requireAuth])
+  }, [router, redirectTo, showError, requireAuth])
 
   return { user, loading, isAuthenticated: !!user }
 }
